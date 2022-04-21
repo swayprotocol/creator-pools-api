@@ -10,6 +10,7 @@ import {
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ValidateMongoId } from 'src/validators/MongoId';
 
 @ApiTags('plan')
 @Controller('plan')
@@ -27,17 +28,18 @@ export class PlanController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateMongoId) id: string) {
     return this.planService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePlanDto: CreatePlanDto) {
+  update(@Param('id',  ValidateMongoId) id: string, @Body() updatePlanDto: CreatePlanDto) {
     return this.planService.update(id, updatePlanDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id',  ValidateMongoId) id: string) {
     return this.planService.remove(id);
   }
 }
+
