@@ -30,6 +30,29 @@ $ yarn start:dev
 $ yarn start:prod
 ```
 
+## Development 
+
+```bash
+# cd to /src directory
+
+# Generate CRUD resource (with test files)
+$ nest g resource [name]
+
+# Generate CRUD resource (without test files)
+$ nest g resource [name] --no-spec
+
+# Select Transport layet = REST API, CRUD entry points = Yes
+
+# You should almost always generate with nest g resource
+# Generate only module
+$ nest g mo [name]
+# Generate only controller
+$ nest g co [name]
+# Generate only service
+$ nest g s [name]
+
+```
+
 ## Test
 
 ```bash
