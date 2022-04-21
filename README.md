@@ -4,7 +4,7 @@ http://localhost:3000/
 
 ## Documentation
 Swagger documentation is accessible:
-http://localhost:3000/api
+http://localhost:3000/
 
 ## Description
 Backend part of Creator pools application, writen in Node.js with Nest framework, using MongoDB as database.
