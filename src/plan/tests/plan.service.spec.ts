@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PlanService } from './plan.service';
+import { PlanService } from '../plan.service';
+
+jest.mock('../plan.service');
 
 describe('PlanService', () => {
   let service: PlanService;
@@ -10,6 +12,7 @@ describe('PlanService', () => {
     }).compile();
 
     service = module.get<PlanService>(PlanService);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
