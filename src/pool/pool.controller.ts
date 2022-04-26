@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PoolService } from './pool.service';
 import { CreatePoolDto } from './dto/create-pool.dto';
 import { Pool } from './entities/pool.entity';
-import { ValidateMongoId } from 'src/validators/MongoId';
+import { ValidateMongoId } from '../validators/MongoId';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('pool')
