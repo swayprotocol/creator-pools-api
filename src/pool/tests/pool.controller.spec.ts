@@ -85,6 +85,9 @@ describe('PoolController', () => {
       }
       pool = await controller.update(stub._id, poolDto);
     })
+    test('should return plan with same id', async () => {
+      expect(pool).toEqual(stub);   
+    })
   })
 
   describe('describe', () => {
