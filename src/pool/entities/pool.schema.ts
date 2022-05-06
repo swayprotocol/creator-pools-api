@@ -6,14 +6,7 @@ export const poolSchema = new mongoose.Schema<Pool>({
     type: String,
   },
   startTime: {
-    type: Number,
-  },
-  totalAmount: {
-    type: Number,
-    default: 0,
-  },
-  numberOfStakes: {
-    type: Number,
-    default: 0,
+    type: Date,
+    default: new Date(),
   },
 });

@@ -1,16 +1,25 @@
-import { IsMongoId, IsNumber, IsString } from "class-validator";
+import { IsDate, IsMongoId, IsNumber, IsString } from 'class-validator';
 
 
 export class CreateStakeDto {
   @IsMongoId()
-  planId: string;
+  plan: string;
   
   @IsMongoId()
-  poolId: string;
+  pool: string;
 
   @IsNumber()
   amount: number;
+  
+  @IsDate()
+  stakedAt: Date;
+
+  @IsDate()
+  stakedUntil: Date;
 
   @IsString()
   wallet: string;
+
+  @IsString()
+  hash: string;
 }

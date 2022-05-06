@@ -42,5 +42,10 @@ export class PlanController {
   remove(@Param('id',  ValidateMongoId) id: string): Promise<Plan> {
     return this.planService.remove(id);
   }
+
+  @Post('/bc')
+  getPlansBC(@Body() ids: Number[]): Promise<Plan[]>{
+    return this.planService.getPlansBc(ids);
+  }
 }
 

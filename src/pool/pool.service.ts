@@ -7,7 +7,9 @@ import { Pool } from './entities/pool.entity';
 @Injectable()
 export class PoolService {
 
-  constructor(@InjectModel('Pool') private readonly poolModel: Model<Pool>){}
+  constructor(
+    @InjectModel('Pool') private readonly poolModel: Model<Pool>,
+  ){}
 
   async create(createPoolDto: CreatePoolDto): Promise<Pool> {
     const pool = new this.poolModel(createPoolDto);
@@ -24,9 +26,23 @@ export class PoolService {
     return pool;
   }
 
+  async findOneByHandle(handle: string): Promise<Pool> {
+    const plan = await this.poolModel.findOne({ creator: handle});
+    return plan;
+  }
+
   async update(id: string, updatePoolDto: CreatePoolDto): Promise<Pool> {
     const pool = await this.poolModel.findOneAndUpdate(
       { _id: id },
+      updatePoolDto,
+      { new: true }
+    );
+    return pool;
+  }
+
+  async updateByHandle(handle: string, updatePoolDto: CreatePoolDto): Promise<Pool> {
+    const pool = await this.poolModel.findOneAndUpdate(
+      { creator: handle },
       updatePoolDto,
       { new: true }
     );

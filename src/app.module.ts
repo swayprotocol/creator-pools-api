@@ -6,11 +6,13 @@ import { MONGO_URL } from './config';
 import { PlanModule } from './plan/plan.module';
 import { PoolModule } from './pool/pool.module';
 import { StakeModule } from './stake/stake.module';
+import { ClaimModule } from './claim/claim.module';
+import { UnstakeModule } from './unstake/unstake.module';
 
 const database = MongooseModule.forRoot(MONGO_URL);
 
 @Module({
-  imports: [database, PlanModule, PoolModule, StakeModule],
+  imports: [database, PlanModule, PoolModule, StakeModule, ClaimModule, UnstakeModule],
   controllers: [AppController],
   providers: [AppService],
 })

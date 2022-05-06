@@ -8,6 +8,12 @@ export class CreatePlanDto {
   @Min(0,{
     message: 'Apy must be positive number'
   })
+  blockchainIndex: number;
+
+  @IsInt()
+  @Min(0,{
+    message: 'Apy must be positive number'
+  })
   apy: number;
   
   @IsDateString()

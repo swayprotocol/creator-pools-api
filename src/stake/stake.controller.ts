@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StakeService } from './stake.service';
 import { CreateStakeDto } from './dto/create-stake.dto';
-import { UpdateStakeDto } from './dto/update-stake.dto';
 import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
 import { ApiTags } from '@nestjs/swagger';
@@ -27,7 +26,7 @@ export class StakeController {
   }
 
   @Patch(':id')
-  update(@Param('id', ValidateMongoId) id: string, @Body() updateStakeDto: UpdateStakeDto): Promise<Stake> {
+  update(@Param('id', ValidateMongoId) id: string, @Body() updateStakeDto: CreateStakeDto): Promise<Stake> {
     return this.stakeService.update(id, updateStakeDto);
   }
 

@@ -21,5 +21,12 @@ export const stakeSchema = new mongoose.Schema<Stake>({
   },
   wallet: {
     type: String,
+  },
+  collected: {
+    type: Boolean,
+    default: false,
+  },
+  hash: {
+    type: String,
   }
 })

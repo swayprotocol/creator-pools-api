@@ -1,5 +1,5 @@
-import { Plan } from "src/plan/entities/plan.entity";
-import { Pool } from "src/pool/entities/pool.entity";
+import { Plan } from '../../plan/entities/plan.entity';
+import { Pool } from '../../pool/entities/pool.entity';
 
 export class Stake {
   _id: string;
@@ -9,4 +9,6 @@ export class Stake {
   stakedUntil: Date;
   amount: number;
   wallet: string;
+  collected: boolean;
+  hash: string;
 }
