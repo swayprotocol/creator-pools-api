@@ -31,26 +31,12 @@ export class PoolService {
     return plan;
   }
 
-  async update(id: string, updatePoolDto: CreatePoolDto): Promise<Pool> {
-    const pool = await this.poolModel.findOneAndUpdate(
-      { _id: id },
-      updatePoolDto,
-      { new: true }
-    );
-    return pool;
-  }
-
   async updateByHandle(handle: string, updatePoolDto: CreatePoolDto): Promise<Pool> {
     const pool = await this.poolModel.findOneAndUpdate(
       { creator: handle },
       updatePoolDto,
       { new: true }
     );
-    return pool;
-  }
-
-  async remove(id: string): Promise<Pool> {
-    const pool = await this.poolModel.findOneAndRemove({_id: id})
     return pool;
   }
 }

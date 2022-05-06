@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Claim } from '../claim/entities/claim.entity';
 import { CreateUnstakeDto } from './dto/create-unstake.dto';
-import { UpdateUnstakeDto } from './dto/update-unstake.dto';
 import { Unstake } from './entities/unstake.entity';
 
 @Injectable()
@@ -31,16 +30,6 @@ export class UnstakeService {
     return unstake;
   }
 
-  async update(id: string, updateUnstakeDto: UpdateUnstakeDto): Promise<Unstake> {
-    const unstake = await this.unstakeModel.findOneAndUpdate({
-      _id: id
-    },{
-      updateUnstakeDto
-    },
-    {new: true});
-    return unstake;
-  }
-
   async pushClaim(id: string, claim: Claim): Promise<Unstake> {
     const unstake = await this.unstakeModel.findOneAndUpdate({
         _id: id
@@ -49,11 +38,6 @@ export class UnstakeService {
       },
       { new: true }
     )
-    return unstake;
-  }
-
-  async remove(id: string): Promise<Unstake> {
-    const unstake = await this.unstakeModel.findOneAndDelete({ _id: id });
     return unstake;
   }
 }

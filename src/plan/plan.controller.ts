@@ -43,7 +43,7 @@ export class PlanController {
     return this.planService.remove(id);
   }
 
-  @Post('/bc')
+  @Post('/onBlockchain')
   getPlansBC(@Body() ids: Number[]): Promise<Plan[]>{
     return this.planService.getPlansBc(ids);
   }

@@ -49,26 +49,11 @@ export class StakeService {
     return stake;
   }
 
-  async update(id: string, updateStakeDto: CreateStakeDto): Promise<Stake> {
-    const stake = await this.stakeModel.findOneAndUpdate(
-      { _id: id },
-      updateStakeDto,
-      { new: true }
-    );
-    return stake;
-  }
-
-  async remove(id: string): Promise<Stake> {
-    const stake = await this.stakeModel.findOneAndDelete({ _id: id })
-    return stake;
-  }
-
   async initialListeners(contract: Promise<Contract>) {
     const stakingContract = await contract;
     
     stakingContract.on('Staked', async (poolHandle, sender, amount, planIndex, receipt) => {
       console.log('Staked')
-      // console.log(poolHandle, sender, amount, planIndex, receipt)
       let pool = await this.poolService.findOneByHandle(poolHandle);
       let plan = await this.planService.findOneByBlockchainIndex(planIndex);
       const stakedAmount = parseFloat(utils.formatEther(amount));
@@ -93,14 +78,12 @@ export class StakeService {
         hash: receipt.transactionHash,
       };
 
-      const stake = await this.create(stakeDto);
-      console.log(stake);
+      await this.create(stakeDto);
     })
 
     stakingContract.on('Reward', async (poolHandle, recipient, amount, receipt) => {
       console.log('Reward claimed');
       const stakedAmount = parseFloat(utils.formatEther(amount));
-      // console.log(poolHandle, recipient, stakedAmount, receipt);
 
       const pool = await this.poolService.findOneByHandle(poolHandle);
       const stakes = await this.stakeModel.find({
@@ -125,15 +108,11 @@ export class StakeService {
       if (unstake) {
         await this.unstakeService.pushClaim(unstake._id, claim);
       }
-
-      console.log(claim);
     })
 
     stakingContract.on('Unstaked', async (poolHandle, recipient, amount, receipt) => {
       console.log('Unstaked');
-      const stakedAmount = parseFloat(utils.formatEther(amount));
-      // console.log(poolHandle, recipient, stakedAmount, receipt);
-      
+
       const pool = await this.poolService.findOneByHandle(poolHandle);
       const stakes = await this.stakeModel.find({
         pool: pool,
@@ -149,7 +128,7 @@ export class StakeService {
 
       const claims = await this.claimService.findAndCollect(recipient, pool._id);
 
-      const unstake = await this.unstakeService.create({
+      await this.unstakeService.create({
         wallet: recipient,
         hash: receipt.transactionHash,
         pool: pool,
@@ -157,8 +136,6 @@ export class StakeService {
         stakes: stakes,
         claims: claims
       });
-
-      console.log(unstake, stakedAmount)
     })
   }
 }

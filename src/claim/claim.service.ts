@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateClaimDto } from './dto/create-claim.dto';
-import { UpdateClaimDto } from './dto/update-claim.dto';
 import { Claim } from './entities/claim.entity';
 
 
@@ -46,17 +45,4 @@ export class ClaimService {
     return claims;
   }
 
-  async update(id: string, updateClaimDto: UpdateClaimDto): Promise<Claim> {
-    const claim = await this.claimModel.findOneAndUpdate(
-      { _id: id },
-      updateClaimDto,
-      { new: true }
-    );
-    return claim;
-  }
-
-  async remove(id: string): Promise<Claim> {
-    const claim = await this.claimModel.findOneAndRemove({ _id: id })
-    return claim;
-  }
 }

@@ -1,17 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ClaimService } from './claim.service';
-import { CreateClaimDto } from './dto/create-claim.dto';
-import { UpdateClaimDto } from './dto/update-claim.dto';
 import { ValidateMongoId } from './../validators/MongoId';
 
+@ApiTags('claim')
 @Controller('claim')
 export class ClaimController {
   constructor(private readonly claimService: ClaimService) {}
-
-  @Post()
-  create(@Body() createClaimDto: CreateClaimDto) {
-    return this.claimService.create(createClaimDto);
-  }
 
   @Get()
   findAll() {
@@ -23,13 +18,4 @@ export class ClaimController {
     return this.claimService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id', ValidateMongoId) id: string, @Body() updateClaimDto: UpdateClaimDto) {
-    return this.claimService.update(id, updateClaimDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ValidateMongoId) id: string) {
-    return this.claimService.remove(id);
-  }
 }
