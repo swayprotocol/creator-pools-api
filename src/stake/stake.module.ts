@@ -8,10 +8,12 @@ import { PoolModule } from '../pool/pool.module';
 import { PlanModule } from '../plan/plan.module';
 import { ClaimModule } from '../claim/claim.module';
 import { UnstakeModule } from '../unstake/unstake.module';
+import { aggregatedPoolSchema } from '../pool/entities/aggregatedPool.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{name: 'Stake', schema: stakeSchema}]),
+    MongooseModule.forFeature([{name: 'AggregatedPool', schema: aggregatedPoolSchema}]),
     PoolModule,
     PlanModule,
     ClaimModule,

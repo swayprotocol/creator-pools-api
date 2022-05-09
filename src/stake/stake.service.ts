@@ -11,11 +11,13 @@ import { PoolService } from '../pool/pool.service';
 import { CreatePoolDto } from '../pool/dto/create-pool.dto';
 import { ClaimService } from '../claim/claim.service';
 import { UnstakeService } from '../unstake/unstake.service';
+import { TopStakedPools } from './dto/topStakedPools.dto';
 
 @Injectable()
 export class StakeService {
   constructor(
     @InjectModel('Stake') private readonly stakeModel: Model<Stake>,
+    @InjectModel('AggregatedPool') private readonly aggregatedPool: Model<TopStakedPools>,
     private readonly contract: StakingContract,
     private readonly planService: PlanService,
     private readonly poolService: PoolService,
@@ -47,6 +49,46 @@ export class StakeService {
   async findOne(id: string): Promise<Stake> {
     const stake = await this.stakeModel.findOne({ _id: id })
     return stake;
+  }
+
+  async topCreatorPools(): Promise<TopStakedPools[]> {
+    const pools: TopStakedPools[] = await this.stakeModel.aggregate([
+      {
+        '$match': {
+          'collected': false
+        }
+      },
+      {
+        '$group': {
+          '_id': '$pool', 
+          'totalAmount': {
+            '$sum': '$amount'
+          }
+        }
+      }, {
+        '$sort': {
+          'totalAmount': -1
+        }
+      }, {
+        '$project': {
+          '_id': 0, 
+          'pool': '$_id', 
+          'totalAmount': '$totalAmount'
+        }
+      }
+    ])
+    const populated: TopStakedPools[] = await this.aggregatedPool.populate(pools, { path: 'pool', model: 'Pool' });
+    return populated;
+    // const populated = await this.stakeModel.populate(pools, { path: 'pool', model: 'Pool' })
+    // return populated
+  }
+
+  async latestStakes(latest: number): Promise<Stake[]> {
+    return await this.stakeModel.find({ collected: false }).sort({stakedAt: -1}).limit(latest);
+  }
+
+  async highestPositions(latest: number): Promise<Stake[]> {
+    return await this.stakeModel.find({ collected: false }).sort({amount: -1}).limit(latest);
   }
 
   async initialListeners(contract: Promise<Contract>) {
