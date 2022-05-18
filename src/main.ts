@@ -7,10 +7,11 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const port = process.env.PORT || 3001;
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const packageJson = require('../package.json');
 
   const config = new DocumentBuilder()
     .setTitle('Creator pools API')
-    .setVersion('1.0')
+    .setVersion(packageJson.version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
