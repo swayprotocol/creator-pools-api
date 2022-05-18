@@ -1,0 +1,10 @@
+service: creatorpools-api-staging
+runtime: nodejs14
+instance_class: F1
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 2
+  max_idle_instances: 0
+  target_cpu_utilization: 0.7
+  max_concurrent_requests: 40

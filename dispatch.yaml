@@ -1,0 +1,6 @@
+dispatch:
+  - url: "api.creatorpools.live/*"
+    service: default
+
+  - url: "api-staging.creatorpools.live/*"
+    service: creatorpools-api-staging
