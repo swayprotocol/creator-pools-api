@@ -1,8 +1,8 @@
-import { Controller, Get, Param, Post} from '@nestjs/common';
+import { Controller, Get, Param, Query} from '@nestjs/common';
 import { StakeService } from './stake.service';
 import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TopStakedPools } from './dto/topStakedPools.dto';
 
 @ApiTags('stake')
@@ -20,14 +20,26 @@ export class StakeController {
     return this.stakeService.topCreatorPools();  
   }
 
-  @Post('/latestStakes')
-  latestStakes(@Param('maxNumber') maxNumber: number): Promise<Stake[]> {
-    return this.stakeService.latestStakes(maxNumber);
+  @ApiQuery({
+    name: "maxNumber",
+    type: String,
+    description: "Optional parameter, default is 10",
+    required: false
+  })
+  @Get('/latestStakes/:maxNumber')
+  latestStakes(@Query('maxNumber') maxNumber?: number): Promise<Stake[]> {
+    return this.stakeService.latestStakes(maxNumber ? maxNumber : 10);
   }
 
-  @Post('/highestPositions')
-  highestPositions(@Param('maxNumber') maxNumber: number): Promise<Stake[]> {
-    return this.stakeService.highestPositions(maxNumber);
+  @ApiQuery({
+    name: "maxNumber",
+    type: String,
+    description: "Optional parameter, default is 10",
+    required: false
+  })
+  @Get('/highestPositions/:maxNumber')
+  highestPositions(@Query('maxNumber') maxNumber?: number): Promise<Stake[]> {
+    return this.stakeService.highestPositions(maxNumber ? maxNumber : 10);
   }
 
   @Get(':id')
