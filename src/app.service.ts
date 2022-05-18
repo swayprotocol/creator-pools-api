@@ -102,7 +102,7 @@ export class AppService {
     })
   }
 
-  getHello(): string {
-    return 'This is Creator pools API go to /api for documentation';
+  getHealth(): Date {
+    return new Date();
   }
 }
