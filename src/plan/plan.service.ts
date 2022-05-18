@@ -52,22 +52,14 @@ export class PlanService {
     return plan;
   }
 
-  async getPlansBc(planIds: Number[]): Promise<Plan[]> {
+  async getPlansBc(): Promise<Plan[]> {
     
     const stakingContract: Contract = await this.contract.getStakingContract();
-    // console.log(await stakingContract.filters)
-    // console.log(await stakingContract.filters.CreatePool())
-    // console.log(await stakingContract.filters.OwnershipTransferred())
-    // console.log(await stakingContract.filters.Reward())
-    // console.log(await stakingContract.filters.Staked())
-    // console.log(await stakingContract.filters.Unstaked())
+    const plans = await this.planModel.find();
 
-    // const filter = stakingContract.filters.CreatePool();
-    // stakingContract.queryFilter(filter, 21001090).then((logs) => {console.log(logs)})
-
-    return Promise.all([0,1,2,3,4,5,6,7,8,9,10].map(planId => {
-      return stakingContract.plans(planId).then(res => ({
-        planId: planId,
+    return Promise.all(plans.map(plan => {
+      return stakingContract.plans(plan.blockchainIndex).then(res => ({
+        planId: plan.blockchainIndex,
         apy: res.apy,
         availableUntil: new Date(+utils.formatUnits(res.availableUntil, 0) * 1000),
         lockMonths: res.lockMonths
