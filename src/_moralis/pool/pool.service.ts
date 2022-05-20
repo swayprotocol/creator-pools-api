@@ -1,8 +1,6 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreatePoolDto } from './dto/create-pool.dto';
-import { UpdatePoolDto } from './dto/update-pool.dto';
 import { Pool } from './entities/pool.entity';
 
 @Injectable()
