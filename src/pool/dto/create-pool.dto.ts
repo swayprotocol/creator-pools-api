@@ -1,4 +1,4 @@
-import { IsDate, IsString, Min } from 'class-validator';
+import { IsDate, IsHash, IsString, Min } from 'class-validator';
 
 export class CreatePoolDto {
   @IsString()
@@ -6,4 +6,7 @@ export class CreatePoolDto {
   
   @IsDate()
   startTime: Date;
+
+  @IsString()
+  hash: string;
 }

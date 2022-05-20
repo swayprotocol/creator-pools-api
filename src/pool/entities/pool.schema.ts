@@ -9,4 +9,7 @@ export const poolSchema = new mongoose.Schema<Pool>({
     type: Date,
     default: new Date(),
   },
+  hash: {
+    type: String,
+  }
 });
