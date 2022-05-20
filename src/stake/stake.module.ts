@@ -8,8 +8,8 @@ import { aggregatedPoolSchema } from '../pool/entities/aggregatedPool.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: 'Stake', schema: stakeSchema}]),
-    MongooseModule.forFeature([{name: 'AggregatedPool', schema: aggregatedPoolSchema}]),
+    MongooseModule.forFeature([{name: 'Stake', schema: stakeSchema}],'ourDb'),
+    MongooseModule.forFeature([{name: 'AggregatedPool', schema: aggregatedPoolSchema}],'ourDb'),
     PlanModule,
   ],
   controllers: [StakeController],

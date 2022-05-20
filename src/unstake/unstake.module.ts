@@ -6,7 +6,7 @@ import { unstakeSchema } from './entities/unstake.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: 'Unstake', schema: unstakeSchema}])
+    MongooseModule.forFeature([{name: 'Unstake', schema: unstakeSchema}], 'ourDb')
   ],
   controllers: [UnstakeController],
   providers: [UnstakeService],

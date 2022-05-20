@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: 'Claim', schema: claimSchema}]),
+    MongooseModule.forFeature([{name: 'Claim', schema: claimSchema}], 'ourDb'),
   ],
   controllers: [ClaimController],
   providers: [ClaimService],
