@@ -4,6 +4,7 @@ import moment from 'moment';
 import { ClaimService } from './claim/claim.service';
 import { PlanService } from './plan/plan.service';
 import { PoolService } from './pool/pool.service';
+import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { StakeService } from './stake/stake.service';
 import { StakingContract } from './shared/StakingContract';
 import { UnstakeService } from './unstake/unstake.service';
@@ -20,6 +21,7 @@ export class AppService {
     private readonly claimService: ClaimService,
     private readonly stakeService: StakeService,
     private readonly unstakeService: UnstakeService,
+    private readonly moralisPoolService: MoralisPoolService
   ){
     this.initialListeners(this.contract.getStakingContract())
   }
@@ -39,6 +41,7 @@ export class AppService {
         const poolDto: CreatePoolDto = {
           creator: poolHandle,
           startTime: new Date(),
+          hash: receipt.transactionHash
         }
         pool = await this.poolService.create(poolDto);
       }
@@ -102,9 +105,24 @@ export class AppService {
     })
   }
 
-  async syncDatabse(): Promise<String> {
-    
-    return 'Imported 10 objects'
+  async syncDatabse() {
+    await this.syncPools()
+  }
+
+  async syncPools() {
+    const pools = await this.poolService.findAll();
+    const poolsHashes = pools.map(pool => { return pool.hash })
+
+    const moralisPools = await this.moralisPoolService.findMissing(poolsHashes);
+
+    for await (const pool of moralisPools) {
+      await this.poolService.create({
+        creator: pool.poolHandle,
+        startTime: pool.block_timestamp,
+        hash: pool.transaction_hash
+      })
+    }
+    console.log(`Pools added: ${moralisPools.length}`)
   }
 
   getHealth(): Date {

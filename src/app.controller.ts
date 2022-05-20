@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('databaseSync')
-  async database(): Promise<String> {
+  async databaseSync() {
     return await this.appService.syncDatabse();
   }
 

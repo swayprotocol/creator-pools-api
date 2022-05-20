@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PoolService } from './pool.service';
+import { MoralisPoolService } from './pool.service';
 import { CreatePoolDto } from './dto/create-pool.dto';
 import { UpdatePoolDto } from './dto/update-pool.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -7,8 +7,8 @@ import { Pool } from './entities/pool.entity';
 
 @ApiTags('poolMoralis')
 @Controller('poolMoralis')
-export class PoolController {
-  constructor(private readonly poolService: PoolService) {}
+export class MoralisPoolController {
+  constructor(private readonly poolService: MoralisPoolService) {}
 
   @Post()
   create(@Body() createPoolDto: CreatePoolDto) {

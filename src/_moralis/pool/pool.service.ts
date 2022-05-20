@@ -6,7 +6,7 @@ import { UpdatePoolDto } from './dto/update-pool.dto';
 import { Pool } from './entities/pool.entity';
 
 @Injectable()
-export class PoolService {
+export class MoralisPoolService {
 
   constructor(
     @InjectModel('Pool') private readonly poolModel: Model<Pool>,
@@ -17,8 +17,6 @@ export class PoolService {
   }
 
   async findAll(): Promise<Pool[]> {
-
-    console.log(this.poolModel)
     const pools = await this.poolModel.find();
     return pools;
   }
@@ -33,5 +31,12 @@ export class PoolService {
 
   remove(id: number) {
     return `This action removes a #${id} pool`;
+  }
+
+  async findMissing(transactionHashes: string[]): Promise<Pool[]> {
+    const pools = await this.poolModel.find({
+      transaction_hash: { $nin: transactionHashes }
+    })
+    return pools
   }
 }
