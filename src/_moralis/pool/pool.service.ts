@@ -12,25 +12,14 @@ export class MoralisPoolService {
     @InjectModel('Pool') private readonly poolModel: Model<Pool>,
   ){}
 
-  create(createPoolDto: CreatePoolDto) {
-    return 'This action adds a new pool';
-  }
-
   async findAll(): Promise<Pool[]> {
     const pools = await this.poolModel.find();
     return pools;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pool`;
-  }
-
-  update(id: number, updatePoolDto: UpdatePoolDto) {
-    return `This action updates a #${id} pool`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} pool`;
+  async findOne(hash: string): Promise<Pool> {
+    const pool = await this.poolModel.findOne({ transaction_hash: hash })
+    return pool
   }
 
   async findMissing(transactionHashes: string[]): Promise<Pool[]> {
