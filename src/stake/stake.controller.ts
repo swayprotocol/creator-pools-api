@@ -21,25 +21,25 @@ export class StakeController {
   }
 
   @ApiQuery({
-    name: "maxNumber",
+    name: "limit",
     type: String,
     description: "Optional parameter, default is 10",
     required: false
   })
-  @Get('/latestStakes/:maxNumber')
-  latestStakes(@Query('maxNumber') maxNumber?: number): Promise<Stake[]> {
-    return this.stakeService.latestStakes(maxNumber ? maxNumber : 10);
+  @Get('/latestStakes')
+  latestStakes(@Query('limit') limit?: number): Promise<Stake[]> {
+    return this.stakeService.latestStakes(limit ? limit : 10);
   }
 
   @ApiQuery({
-    name: "maxNumber",
+    name: "limit",
     type: String,
     description: "Optional parameter, default is 10",
     required: false
   })
-  @Get('/highestPositions/:maxNumber')
-  highestPositions(@Query('maxNumber') maxNumber?: number): Promise<Stake[]> {
-    return this.stakeService.highestPositions(maxNumber ? maxNumber : 10);
+  @Get('/highestPositions')
+  highestPositions(@Query('limit') limit?: number): Promise<Stake[]> {
+    return this.stakeService.highestPositions(limit ? limit : 10);
   }
 
   @Get(':id')
