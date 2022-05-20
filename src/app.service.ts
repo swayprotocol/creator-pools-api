@@ -102,6 +102,11 @@ export class AppService {
     })
   }
 
+  async syncDatabse(): Promise<String> {
+    
+    return 'Imported 10 objects'
+  }
+
   getHealth(): Date {
     return new Date();
   }
