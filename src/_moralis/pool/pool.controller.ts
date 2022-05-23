@@ -1,8 +1,7 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { MoralisPoolService } from './pool.service';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Pool } from './entities/pool.entity';
-import { query } from 'express';
 
 @ApiTags('poolMoralis')
 @Controller('poolMoralis')
