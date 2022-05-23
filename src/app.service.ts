@@ -10,6 +10,7 @@ import { StakingContract } from './shared/StakingContract';
 import { UnstakeService } from './unstake/unstake.service';
 import { CreatePoolDto } from './pool/dto/create-pool.dto';
 import { CreateStakeDto } from './stake/dto/create-stake.dto';
+import { MoralisStakeService } from './_moralis/stake/stake.service';
 
 @Injectable()
 export class AppService {
@@ -21,7 +22,8 @@ export class AppService {
     private readonly claimService: ClaimService,
     private readonly stakeService: StakeService,
     private readonly unstakeService: UnstakeService,
-    private readonly moralisPoolService: MoralisPoolService
+    private readonly moralisPoolService: MoralisPoolService,
+    private readonly moralisStakeService: MoralisStakeService,
   ){
     this.initialListeners(this.contract.getStakingContract())
   }
@@ -107,10 +109,11 @@ export class AppService {
 
   async syncDatabse() {
     await this.syncPools()
+    await this.syncStakes()
   }
 
   async syncPools() {
-    const pools = await this.poolService.findAll();
+    const pools = await this.poolService.findAll()
     const poolsHashes = pools.map(pool => { return pool.hash })
 
     const moralisPools = await this.moralisPoolService.findMissing(poolsHashes);
@@ -123,6 +126,34 @@ export class AppService {
       })
     }
     console.log(`Pools added: ${moralisPools.length}`)
+  }
+
+  async syncStakes() {
+    const stakes = await this.stakeService.findAll()
+    const stakesHashes = stakes.map(pool => { return pool.hash })
+
+    const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes);
+
+    const plansArray = await this.planService.findAll();
+    const plans = Object.assign({}, ...plansArray.map((x) => ({[x.blockchainIndex]: x._id})));
+    const poolsArray = await this.poolService.findAll();
+    const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
+
+    for await (const stake of moralisStakes) {
+      const stakedAt = moment(stake.block_timestamp);
+      const plan = plans[stake.planId]
+
+      await this.stakeService.create({
+        plan: plan,
+        pool: pools[stake.poolHandle],
+        amount: parseFloat(utils.formatEther(stake.amount)),
+        stakedAt: stakedAt.toDate(),
+        stakedUntil: stakedAt.add(plan.lockMonths,'M').toDate(),
+        wallet: stake.sender,
+        hash: stake.transaction_hash
+      })
+    }
+    console.log(`Stakes added: ${moralisStakes.length}`)
   }
 
   getHealth(): Date {

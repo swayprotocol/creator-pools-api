@@ -10,12 +10,23 @@ import { ClaimModule } from './claim/claim.module';
 import { UnstakeModule } from './unstake/unstake.module';
 import { StakingContract } from './shared/StakingContract';
 import { MoralisPoolModule } from './_moralis/pool/pool.module';
+import { MoralisStakeModule } from './_moralis/stake/stake.module';
 
 const ourDB = MongooseModule.forRoot(MONGO_URL, {connectionName: 'ourDb'});
 const moralisDB = MongooseModule.forRoot(MORALIS_URL, {connectionName: 'moralisDb'});
 
 @Module({
-  imports: [ourDB, moralisDB, PlanModule, PoolModule, StakeModule, ClaimModule, UnstakeModule, MoralisPoolModule],
+  imports: [
+    ourDB, 
+    moralisDB, 
+    PlanModule, 
+    PoolModule, 
+    StakeModule, 
+    ClaimModule, 
+    UnstakeModule, 
+    MoralisPoolModule,
+    MoralisStakeModule
+  ],
   controllers: [AppController],
   providers: [AppService, StakingContract],
 })
