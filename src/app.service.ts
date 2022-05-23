@@ -4,13 +4,14 @@ import moment from 'moment';
 import { ClaimService } from './claim/claim.service';
 import { PlanService } from './plan/plan.service';
 import { PoolService } from './pool/pool.service';
-import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { StakeService } from './stake/stake.service';
 import { StakingContract } from './shared/StakingContract';
 import { UnstakeService } from './unstake/unstake.service';
 import { CreatePoolDto } from './pool/dto/create-pool.dto';
 import { CreateStakeDto } from './stake/dto/create-stake.dto';
+import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { MoralisStakeService } from './_moralis/stake/stake.service';
+import { MoralisClaimService } from './_moralis/claim/claim.service';
 
 @Injectable()
 export class AppService {
@@ -24,6 +25,7 @@ export class AppService {
     private readonly unstakeService: UnstakeService,
     private readonly moralisPoolService: MoralisPoolService,
     private readonly moralisStakeService: MoralisStakeService,
+    private readonly moralisClaimService: MoralisClaimService
   ){
     this.initialListeners(this.contract.getStakingContract())
   }
@@ -110,6 +112,7 @@ export class AppService {
   async syncDatabse() {
     await this.syncPools()
     await this.syncStakes()
+    await this.syncClaims()
   }
 
   async syncPools() {
@@ -130,7 +133,7 @@ export class AppService {
 
   async syncStakes() {
     const stakes = await this.stakeService.findAll()
-    const stakesHashes = stakes.map(pool => { return pool.hash })
+    const stakesHashes = stakes.map(stake => { return stake.hash })
 
     const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes);
 
@@ -154,6 +157,17 @@ export class AppService {
       })
     }
     console.log(`Stakes added: ${moralisStakes.length}`)
+  }
+
+  async syncClaims() {
+    const claims = await this.claimService.findAll()
+    const claimsHashes = claims.map(claim => { return claim.hash })
+
+    const moralisClaims = await this.moralisClaimService.findMissing(claimsHashes)
+
+    for await (const claim of moralisClaims) {
+      console.log(claim)
+    }
   }
 
   getHealth(): Date {
