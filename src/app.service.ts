@@ -68,7 +68,6 @@ export class AppService {
       const stakedAmount = parseFloat(utils.formatEther(amount));
 
       const pool = await this.poolService.findOneByHandle(poolHandle);
-      const stakes = await this.stakeService.findUncollected(recipient, pool);
 
       // After unstake sometimes claim event happened after unstake event
       const unstake = await this.unstakeService.findByHash(receipt.transactionHash);
@@ -79,7 +78,6 @@ export class AppService {
         amount: stakedAmount,
         claimDate: new Date(),
         hash: receipt.transactionHash,
-        stakes: stakes,
         unstaked: (unstake ? true : false)
       });
 
@@ -165,9 +163,20 @@ export class AppService {
 
     const moralisClaims = await this.moralisClaimService.findMissing(claimsHashes)
 
+    const poolsArray = await this.poolService.findAll();
+    const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
+
     for await (const claim of moralisClaims) {
-      console.log(claim)
+      await this.claimService.create({
+        wallet: claim.recipient,
+        pool: pools[claim.poolHandle],
+        amount: parseFloat(utils.formatEther(claim.amount)),
+        claimDate: moment(claim.block_timestamp).toDate(),
+        hash: claim.transaction_hash,
+        unstaked: false
+      })
     }
+    console.log(`Claims added: ${moralisClaims.length}`)
   }
 
   getHealth(): Date {

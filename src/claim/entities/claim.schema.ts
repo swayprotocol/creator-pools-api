@@ -18,10 +18,6 @@ export const claimSchema = new mongoose.Schema<Claim>({
   hash: {
     type: String,
   },
-  stakes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Stake'
-  }],
   unstaked: {
     type: Boolean,
     default: false,
