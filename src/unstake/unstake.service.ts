@@ -28,6 +28,11 @@ export class UnstakeService {
     return await unstake.save();
   }
 
+  async findAllAfter(after: Date): Promise<Unstake[]> {
+    const unstakes = await this.unstakeModel.find({ unstakeDate: { $gte: after } });
+    return unstakes;
+  }
+
   async findAll(): Promise<Unstake[]> {
     const unstakes = await this.unstakeModel.find();
     return unstakes;
@@ -70,7 +75,7 @@ export class UnstakeService {
         wallet: recipient,
         hash: receipt.transactionHash,
         pool: pool,
-        unclaimDate: new Date(),
+        unstakeDate: new Date(),
         amount: parseFloat(utils.formatEther(amount)),
       });
     })

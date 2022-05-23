@@ -16,6 +16,11 @@ export class PoolService {
     return await pool.save();
   }
 
+  async findAllAfter(date: Date): Promise<Pool[]> {
+    const pools = await this.poolModel.find({ startTime: { $gte: date } })
+    return pools
+  }
+
   async findAll(): Promise<Pool[]> {
     const pools = await this.poolModel.find();
     return pools;

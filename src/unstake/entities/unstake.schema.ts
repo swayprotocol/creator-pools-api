@@ -8,7 +8,7 @@ export const unstakeSchema = new mongoose.Schema<Unstake>({
   hash: {
     type: String,
   },
-  unclaimDate: {
+  unstakeDate: {
     type: Date,
   },
   pool: {

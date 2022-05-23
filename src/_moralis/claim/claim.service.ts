@@ -20,9 +20,10 @@ export class MoralisClaimService {
     return claim
   }
 
-  async findMissing(transactionHashes: string[]): Promise<Claim[]> {
+  async findMissing(transactionHashes: string[], after): Promise<Claim[]> {
     const claims = await this.claimModel.find({
-      transaction_hash: { $nin: transactionHashes }
+      transaction_hash: { $nin: transactionHashes },
+      block_timestamp: { $gte: after }
     })
     return claims
   }

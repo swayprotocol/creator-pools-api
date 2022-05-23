@@ -20,9 +20,10 @@ export class MoralisUnstakeService {
     return unstake
   }
 
-  async findMissing(transactionHashes: string[]): Promise<Unstake[]> {
+  async findMissing(transactionHashes: string[], after: Date): Promise<Unstake[]> {
     const unstakes = await this.unstakeModel.find({
-      transaction_hash: { $nin: transactionHashes }
+      transaction_hash: { $nin: transactionHashes },
+      block_timestamp: { $gte: after }
     })
     return unstakes
   }

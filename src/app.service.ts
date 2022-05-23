@@ -27,20 +27,21 @@ export class AppService {
   ){}
 
 
-  async syncDatabse() {
+  async syncDatabse(fromDate: Date) {
     console.log(`Sync started ${new Date()}`)
-    await this.syncPools()
-    await this.syncStakes()
-    await this.syncClaims()
-    await this.syncUnstake()
+    await this.syncPools(fromDate)
+    await this.syncStakes(fromDate)
+    await this.syncClaims(fromDate)
+    await this.syncUnstake(fromDate
+      )
     console.log(`Sync finished ${new Date()}`)
   }
 
-  async syncPools() {
-    const pools = await this.poolService.findAll()
+  async syncPools(fromDate: Date) {
+    const pools = await this.poolService.findAllAfter(fromDate)
     const poolsHashes = pools.map(pool => { return pool.hash })
 
-    const moralisPools = await this.moralisPoolService.findMissing(poolsHashes);
+    const moralisPools = await this.moralisPoolService.findMissing(poolsHashes, fromDate);
 
     for await (const pool of moralisPools) {
       await this.poolService.create({
@@ -52,11 +53,11 @@ export class AppService {
     console.log(`Pools added: ${moralisPools.length}`)
   }
 
-  async syncStakes() {
-    const stakes = await this.stakeService.findAll()
+  async syncStakes(fromDate: Date) {
+    const stakes = await this.stakeService.findAllAfter(fromDate)
     const stakesHashes = stakes.map(stake => { return stake.hash })
 
-    const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes);
+    const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes, fromDate);
 
     const plansArray = await this.planService.findAll();
     const plans = Object.assign({}, ...plansArray.map((x) => ({[x.blockchainIndex]: x._id})));
@@ -80,11 +81,11 @@ export class AppService {
     console.log(`Stakes added: ${moralisStakes.length}`)
   }
 
-  async syncClaims() {
-    const claims = await this.claimService.findAll()
+  async syncClaims(fromDate: Date) {
+    const claims = await this.claimService.findAllAfter(fromDate)
     const claimsHashes = claims.map(claim => { return claim.hash })
 
-    const moralisClaims = await this.moralisClaimService.findMissing(claimsHashes)
+    const moralisClaims = await this.moralisClaimService.findMissing(claimsHashes, fromDate)
 
     const poolsArray = await this.poolService.findAll();
     const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
@@ -102,11 +103,11 @@ export class AppService {
     console.log(`Claims added: ${moralisClaims.length}`)
   }
 
-  async syncUnstake() {
-    const unstakes = await this.unstakeService.findAll()
+  async syncUnstake(fromDate: Date) {
+    const unstakes = await this.unstakeService.findAllAfter(fromDate)
     const unstakesHashes = unstakes.map(unstake => { return unstake.hash })
 
-    const moralisUnstakes = await this.moralisUnstakeService.findMissing(unstakesHashes)
+    const moralisUnstakes = await this.moralisUnstakeService.findMissing(unstakesHashes, fromDate)
 
     const poolsArray = await this.poolService.findAll();
     const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
@@ -123,7 +124,7 @@ export class AppService {
         wallet: unstake.recipient,
         hash: unstake.transaction_hash,
         pool: pool,
-        unclaimDate: moment(unstake.block_timestamp).toDate(),
+        unstakeDate: moment(unstake.block_timestamp).toDate(),
         amount: parseFloat(utils.formatEther(unstake.amount)),
       })
     }

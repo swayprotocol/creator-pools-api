@@ -12,7 +12,7 @@ export class CreateUnstakeDto {
   pool: Pool;
 
   @IsDate()
-  unclaimDate: Date;
+  unstakeDate: Date;
 
   @IsNumber()
   amount: Number;

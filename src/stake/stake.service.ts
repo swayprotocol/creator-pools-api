@@ -38,6 +38,11 @@ export class StakeService {
     return await stake.save();
   }
 
+  async findAllAfter(after: Date): Promise<Stake[]> {
+    const stakes = await this.stakeModel.find({ stakedAt: { $gte: after } });
+    return stakes;
+  }
+
   async findAll(): Promise<Stake[]> {
     const stakes = await this.stakeModel.find();
     return stakes;

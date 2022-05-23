@@ -27,6 +27,11 @@ export class ClaimService {
     return claim;
   }
 
+  async findAllAfter(after: Date): Promise<Claim[]> {
+    const claims = await this.claimModel.find({ claimDate: { $gte: after } });
+    return claims;
+  }
+
   async findAll(): Promise<Claim[]> {
     const claims = await this.claimModel.find();
     return claims;

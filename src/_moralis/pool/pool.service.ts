@@ -20,9 +20,10 @@ export class MoralisPoolService {
     return pool
   }
 
-  async findMissing(transactionHashes: string[]): Promise<Pool[]> {
+  async findMissing(transactionHashes: string[], after: Date): Promise<Pool[]> {
     const pools = await this.poolModel.find({
-      transaction_hash: { $nin: transactionHashes }
+      transaction_hash: { $nin: transactionHashes },
+      block_timestamp: { $gte: after }
     })
     return pools
   }
