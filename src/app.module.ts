@@ -32,6 +32,6 @@ const moralisDB = MongooseModule.forRoot(MORALIS_URL, {connectionName: 'moralisD
     MoralisUnstakeModule
   ],
   controllers: [AppController],
-  providers: [AppService, StakingContract],
+  providers: [AppService],
 })
 export class AppModule {}
