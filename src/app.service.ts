@@ -12,6 +12,7 @@ import { CreateStakeDto } from './stake/dto/create-stake.dto';
 import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { MoralisStakeService } from './_moralis/stake/stake.service';
 import { MoralisClaimService } from './_moralis/claim/claim.service';
+import { MoralisUnstakeService } from './_moralis/unstake/unstake.service';
 
 @Injectable()
 export class AppService {
@@ -25,7 +26,8 @@ export class AppService {
     private readonly unstakeService: UnstakeService,
     private readonly moralisPoolService: MoralisPoolService,
     private readonly moralisStakeService: MoralisStakeService,
-    private readonly moralisClaimService: MoralisClaimService
+    private readonly moralisClaimService: MoralisClaimService,
+    private readonly moralisUnstakeService: MoralisUnstakeService
   ){
     this.initialListeners(this.contract.getStakingContract())
   }
@@ -93,16 +95,14 @@ export class AppService {
       const stakes = await this.stakeService.findStakedUntil(recipient, pool);
       const stakeIDs = stakes.map(stake => {return stake._id});
       await this.stakeService.collect(stakeIDs);
-
-      const claims = await this.claimService.findAndCollect(recipient, pool._id);
+      await this.claimService.findAndCollect(recipient, pool._id);
 
       await this.unstakeService.create({
         wallet: recipient,
         hash: receipt.transactionHash,
         pool: pool,
         unclaimDate: new Date(),
-        stakes: stakes,
-        claims: claims
+        amount: parseFloat(utils.formatEther(amount)),
       });
     })
   }
@@ -111,6 +111,7 @@ export class AppService {
     await this.syncPools()
     await this.syncStakes()
     await this.syncClaims()
+    await this.syncUnstake()
   }
 
   async syncPools() {
@@ -177,6 +178,34 @@ export class AppService {
       })
     }
     console.log(`Claims added: ${moralisClaims.length}`)
+  }
+
+  async syncUnstake() {
+    const unstakes = await this.unstakeService.findAll()
+    const unstakesHashes = unstakes.map(unstake => { return unstake.hash })
+
+    const moralisUnstakes = await this.moralisUnstakeService.findMissing(unstakesHashes)
+
+    const poolsArray = await this.poolService.findAll();
+    const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
+
+    for await (const unstake of moralisUnstakes) {
+      const pool = pools[unstake.poolHandle]
+      
+      const stakes = await this.stakeService.findStakedUntil(unstake.recipient, pool);
+      const stakeIDs = stakes.map(stake => {return stake._id});
+      await this.stakeService.collect(stakeIDs);
+      await this.claimService.findAndCollect(unstake.recipient, pool._id);
+      
+      await this.unstakeService.create({
+        wallet: unstake.recipient,
+        hash: unstake.transaction_hash,
+        pool: pool,
+        unclaimDate: moment(unstake.block_timestamp).toDate(),
+        amount: parseFloat(utils.formatEther(unstake.amount)),
+      })
+    }
+    console.log(`Unstakes added: ${moralisUnstakes.length}`)
   }
 
   getHealth(): Date {

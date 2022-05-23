@@ -9,6 +9,5 @@ export class Unstake {
   hash: string;
   pool: Pool;
   unclaimDate: Date;
-  stakes: Stake[];
-  claims: Claim[];
+  amount: Number;
 }

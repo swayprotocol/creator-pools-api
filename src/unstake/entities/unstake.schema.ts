@@ -15,12 +15,7 @@ export const unstakeSchema = new mongoose.Schema<Unstake>({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Pool'
   },
-  stakes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Stake'
-  }],
-  claims: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Claim'
-  }],
+  amount: {
+    type: Number,
+  }
 })
