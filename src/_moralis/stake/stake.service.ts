@@ -15,8 +15,8 @@ export class MoralisStakeService {
     return stakes;
   }
 
-  async findOne(hash: string): Promise<Stake> {
-    const stake = await this.stakeModel.findOne({ transaction_hash: hash });
+  async findOne(transactionHash: string): Promise<Stake> {
+    const stake = await this.stakeModel.findOne({ transaction_hash: transactionHash });
     return stake;
   }
 

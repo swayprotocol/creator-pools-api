@@ -1,7 +1,9 @@
 import { Controller, Get, Param, } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MoralisStakeService } from './stake.service';
 
-@Controller('stake')
+@ApiTags('stakeMoralis')
+@Controller('stkaeMoralis')
 export class MoralisStakeController {
   constructor(private readonly stakeService: MoralisStakeService) {}
 
