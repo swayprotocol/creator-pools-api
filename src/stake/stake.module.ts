@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { stakeSchema } from './entities/stake.schema';
 import { PlanModule } from '../plan/plan.module';
 import { aggregatedPoolSchema } from '../pool/entities/aggregatedPool.schema';
-import { StakingContract } from '../shared/StakingContract';
-import { PoolModule } from 'src/pool/pool.module';
+import { PoolModule } from '../pool/pool.module';
 
 @Module({
   imports: [
@@ -16,7 +15,7 @@ import { PoolModule } from 'src/pool/pool.module';
     PoolModule,
   ],
   controllers: [StakeController],
-  providers: [StakeService, StakingContract],
+  providers: [StakeService],
   exports: [StakeService],
 })
 export class StakeModule {}

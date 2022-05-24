@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { utils } from 'ethers';
 import moment from 'moment';
 import { ClaimService } from './claim/claim.service';
@@ -65,15 +65,14 @@ export class AppService {
     const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
     for await (const stake of moralisStakes) {
-      const stakedAt = moment(stake.block_timestamp);
       const plan = plans[stake.planId]
 
       await this.stakeService.create({
         plan: plan,
         pool: pools[stake.poolHandle],
         amount: parseFloat(utils.formatEther(stake.amount)),
-        stakedAt: stakedAt.toDate(),
-        stakedUntil: stakedAt.add(plan.lockMonths,'M').toDate(),
+        stakedAt: stake.block_timestamp,
+        stakedUntil: moment(stake.block_timestamp).add(plan.lockMonths,'M').toDate(),
         wallet: stake.sender,
         hash: stake.transaction_hash
       })
@@ -95,7 +94,7 @@ export class AppService {
         wallet: claim.recipient,
         pool: pools[claim.poolHandle],
         amount: parseFloat(utils.formatEther(claim.amount)),
-        claimDate: moment(claim.block_timestamp).toDate(),
+        claimDate: claim.block_timestamp,
         hash: claim.transaction_hash,
         unstaked: false
       })
@@ -124,7 +123,7 @@ export class AppService {
         wallet: unstake.recipient,
         hash: unstake.transaction_hash,
         pool: pool,
-        unstakeDate: moment(unstake.block_timestamp).toDate(),
+        unstakeDate: unstake.block_timestamp,
         amount: parseFloat(utils.formatEther(unstake.amount)),
       })
     }

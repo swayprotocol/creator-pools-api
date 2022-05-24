@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { MoralisStakeService } from './stake.service';
 
 @ApiTags('stakeMoralis')
-@Controller('stkaeMoralis')
+@Controller('stakeMoralis')
 export class MoralisStakeController {
   constructor(private readonly stakeService: MoralisStakeService) {}
 

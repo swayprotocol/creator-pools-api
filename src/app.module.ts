@@ -8,7 +8,6 @@ import { PoolModule } from './pool/pool.module';
 import { StakeModule } from './stake/stake.module';
 import { ClaimModule } from './claim/claim.module';
 import { UnstakeModule } from './unstake/unstake.module';
-import { StakingContract } from './shared/StakingContract';
 import { MoralisPoolModule } from './_moralis/pool/pool.module';
 import { MoralisStakeModule } from './_moralis/stake/stake.module';
 import { MoralisClaimModule } from './_moralis/claim/claim.module';
