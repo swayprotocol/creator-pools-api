@@ -67,5 +67,25 @@ export class PlanService {
     }));
   }
 
+  async getActive(): Promise<Plan[]> {
+    const currentDate = new Date()
+    const plans = await this.planModel.find({
+      createdAt: { $lte: currentDate },
+      availableUntil: { $gt: currentDate}
+    })
+
+    return plans;
+  }
+
+  async getMaxApy(): Promise<Plan> {
+    const currentDate = new Date()
+    const plans = await this.planModel.find({
+      createdAt: { $lte: currentDate },
+      availableUntil: { $gt: currentDate}
+    }).sort({apy: -1})
+
+    return plans[0]
+  }
+
 }
 
