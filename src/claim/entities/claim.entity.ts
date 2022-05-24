@@ -1,5 +1,4 @@
 import { Pool } from '../../pool/entities/pool.entity';
-import { Stake } from '../../stake/entities/stake.entity';
 
 export class Claim {
   _id: string;
@@ -8,6 +7,5 @@ export class Claim {
   amount: number;
   claimDate: Date;
   hash: string;
-  stakes: Stake[];
   unstaked: boolean;
 }

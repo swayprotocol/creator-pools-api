@@ -1,7 +1,5 @@
-import { IsString, IsObject, IsDate } from 'class-validator';
-import { Claim } from '../../claim/entities/claim.entity';
-import { Pool } from '../..//pool/entities/pool.entity';
-import { Stake } from '../..//stake/entities/stake.entity';
+import { IsString, IsObject, IsDate, IsNumber } from 'class-validator';
+import { Pool } from '../../pool/entities/pool.entity';
 
 export class CreateUnstakeDto {
   @IsString()
@@ -14,9 +12,9 @@ export class CreateUnstakeDto {
   pool: Pool;
 
   @IsDate()
-  unclaimDate: Date;
+  unstakeDate: Date;
+
+  @IsNumber()
+  amount: Number;
   
-  stakes: Stake[];
-  
-  claims: Claim[];
 }

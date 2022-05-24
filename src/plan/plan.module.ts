@@ -7,7 +7,7 @@ import { StakingContract } from '../shared/StakingContract';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: 'Plan', schema: planSchema}]),
+    MongooseModule.forFeature([{name: 'Plan', schema: planSchema}], 'ourDb'),
   ],
   controllers: [PlanController],
   providers: [PlanService, StakingContract],

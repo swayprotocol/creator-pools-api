@@ -1,6 +1,5 @@
-import { IsArray, IsBoolean, IsDate, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsObject, IsString } from 'class-validator';
 import { Pool } from '../../pool/entities/pool.entity';
-import { Stake } from '../../stake/entities/stake.entity';
 
 export class CreateClaimDto {
   @IsString()
@@ -17,8 +16,6 @@ export class CreateClaimDto {
   
   @IsString()
   hash: string;
-
-  stakes: Stake[];
   
   @IsBoolean()
   unstaked: boolean;

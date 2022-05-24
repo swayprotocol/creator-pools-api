@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateClaimDto } from './dto/create-claim.dto';
 import { Claim } from './entities/claim.entity';
+import { PoolService } from '../pool/pool.service';
+import { UnstakeService } from '../unstake/unstake.service';
 
 
 @Injectable()
@@ -10,12 +12,19 @@ export class ClaimService {
 
   constructor(
     @InjectModel('Claim') private readonly claimModel: Model<Claim>,
+    private readonly poolService: PoolService,
+    private readonly unstakeService: UnstakeService,
   ) {}
 
   async create(createClaimDto: CreateClaimDto): Promise<Claim> {
     const claim = new this.claimModel(createClaimDto);
     await claim.save();
     return claim;
+  }
+
+  async findAllAfter(after: Date): Promise<Claim[]> {
+    const claims = await this.claimModel.find({ claimDate: { $gte: after } });
+    return claims;
   }
 
   async findAll(): Promise<Claim[]> {
@@ -44,5 +53,4 @@ export class ClaimService {
 
     return claims;
   }
-
 }

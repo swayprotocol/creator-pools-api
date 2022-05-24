@@ -1,18 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Contract, utils } from 'ethers';
 import { Claim } from '../claim/entities/claim.entity';
 import { CreateUnstakeDto } from './dto/create-unstake.dto';
 import { Unstake } from './entities/unstake.entity';
+import { PoolService } from '../pool/pool.service';
+import { ClaimService } from '../claim/claim.service';
+import { StakeService } from '../stake/stake.service';
 
 @Injectable()
 export class UnstakeService {
   constructor(
     @InjectModel('Unstake') private readonly unstakeModel: Model<Unstake>,
+    private readonly poolService: PoolService,
+    @Inject(forwardRef(() => ClaimService))
+    private readonly claimService: ClaimService,
+    private readonly stakeService: StakeService,
   ){}
+
   async create(createUnstakeDto: CreateUnstakeDto): Promise<Unstake> {
     const unstake = new this.unstakeModel(createUnstakeDto);
     return await unstake.save();
+  }
+
+  async findAllAfter(after: Date): Promise<Unstake[]> {
+    const unstakes = await this.unstakeModel.find({ unstakeDate: { $gte: after } });
+    return unstakes;
   }
 
   async findAll(): Promise<Unstake[]> {

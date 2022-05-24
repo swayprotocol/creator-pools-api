@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Contract, utils } from 'ethers';
 import moment from 'moment';
 import { Stake } from './entities/stake.entity';
 import { CreateStakeDto } from './dto/create-stake.dto';
@@ -29,6 +28,11 @@ export class StakeService {
       hash: createStakeDto.hash,
     });
     return await stake.save();
+  }
+
+  async findAllAfter(after: Date): Promise<Stake[]> {
+    const stakes = await this.stakeModel.find({ stakedAt: { $gte: after } });
+    return stakes;
   }
 
   async findAll(): Promise<Stake[]> {

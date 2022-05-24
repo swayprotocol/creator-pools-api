@@ -8,19 +8,14 @@ export const unstakeSchema = new mongoose.Schema<Unstake>({
   hash: {
     type: String,
   },
-  unclaimDate: {
+  unstakeDate: {
     type: Date,
   },
   pool: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Pool'
   },
-  stakes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Stake'
-  }],
-  claims: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Claim'
-  }],
+  amount: {
+    type: Number,
+  }
 })
