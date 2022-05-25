@@ -3,9 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
@@ -28,14 +28,24 @@ export class PlanController {
     return this.planService.findAll();
   }
 
+  @Get('/onBlockchain')
+  getPlansBC(@Query('name') name: string): Promise<Plan[]>{
+    return this.planService.getPlansBc(name);
+  }
+
+  @Get('/active')
+  getActive(): Promise<Plan[]> {
+    return this.planService.getActive()
+  }
+
+  @Get('/maxApy')
+  getMaxApy(): Promise<Plan> {
+    return this.planService.getMaxApy()
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Plan> {
     return this.planService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id',  ValidateMongoId) id: string, @Body() updatePlanDto: CreatePlanDto): Promise<Plan> {
-    return this.planService.update(id, updatePlanDto);
   }
 
   @Delete(':id')
@@ -43,9 +53,5 @@ export class PlanController {
     return this.planService.remove(id);
   }
 
-  @Post('/onBlockchain')
-  getPlansBC(): Promise<Plan[]>{
-    return this.planService.getPlansBc();
-  }
 }
 

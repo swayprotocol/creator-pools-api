@@ -35,26 +35,14 @@ export class PlanService {
     return plan;
   }
 
-  async update(id: string, updatePlanDto: CreatePlanDto): Promise<Plan> {
-    const stakingContract: Contract = await this.contract.getStakingContract();
-    const result = await stakingContract.changePlan(0,12,111,100000);
-    await result.wait()
-    const plan = await this.planModel.findOneAndUpdate(
-      { _id: id },
-      updatePlanDto,
-      { new: true }
-    );
-    return plan;
-  }
-
   async remove(id: string): Promise<Plan> {
     const plan = await this.planModel.findOneAndRemove({_id: id})
     return plan;
   }
 
-  async getPlansBc(): Promise<Plan[]> {
+  async getPlansBc(name: string): Promise<Plan[]> {
     
-    const stakingContract: Contract = await this.contract.getStakingContract();
+    const stakingContract: Contract = await this.contract.getStakingContract(name);
     const plans = await this.planModel.find();
 
     return Promise.all(plans.map(plan => {
@@ -65,6 +53,26 @@ export class PlanService {
         lockMonths: res.lockMonths
       }));
     }));
+  }
+
+  async getActive(): Promise<Plan[]> {
+    const currentDate = new Date()
+    const plans = await this.planModel.find({
+      createdAt: { $lte: currentDate },
+      availableUntil: { $gt: currentDate}
+    })
+
+    return plans;
+  }
+
+  async getMaxApy(): Promise<Plan> {
+    const currentDate = new Date()
+    const plans = await this.planModel.find({
+      createdAt: { $lte: currentDate },
+      availableUntil: { $gt: currentDate}
+    }).sort({apy: -1})
+
+    return plans[0]
   }
 
 }

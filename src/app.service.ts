@@ -130,6 +130,33 @@ export class AppService {
     console.log(`Unstakes added: ${moralisUnstakes.length}`)
   }
 
+  async getConfig(name: string): Promise<NodeRequire> {
+    try {
+      const config = await require(`./shared/configs/${name}Config.json`)
+      return config
+    } catch (error) {
+      return null
+    }
+  }
+
+  async getStakingAbi(name: string): Promise<NodeRequire> {
+    try {
+      const abi = await require(`./shared/abis/${name}/staking-abi.json`)
+      return abi
+    } catch (error) {
+      return null
+    }
+  }
+
+  async getTokenAbi(name: string): Promise<NodeRequire> {
+    try {
+      const abi = await require(`./shared/abis/${name}/token-abi.json`)
+      return abi
+    } catch (error) {
+      return null
+    }
+  }
+
   getHealth(): Date {
     return new Date();
   }
