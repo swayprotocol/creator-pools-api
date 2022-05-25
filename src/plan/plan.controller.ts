@@ -28,6 +28,21 @@ export class PlanController {
     return this.planService.findAll();
   }
 
+  @Get('/onBlockchain')
+  getPlansBC(): Promise<Plan[]> {
+    return this.planService.getPlansBc();
+  }
+
+  @Get('/active')
+  getActive(): Promise<Plan[]> {
+    return this.planService.getActive()
+  }
+
+  @Get('/maxApy')
+  getMaxApy(): Promise<Plan> {
+    return this.planService.getMaxApy()
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Plan> {
     return this.planService.findOne(id);
@@ -41,11 +56,6 @@ export class PlanController {
   @Delete(':id')
   remove(@Param('id',  ValidateMongoId) id: string): Promise<Plan> {
     return this.planService.remove(id);
-  }
-
-  @Post('/onBlockchain')
-  getPlansBC(): Promise<Plan[]>{
-    return this.planService.getPlansBc();
   }
 }
 
