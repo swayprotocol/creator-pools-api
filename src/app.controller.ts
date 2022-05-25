@@ -1,6 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import moment from 'moment';
 import { AppService } from './app.service';
+
 @ApiTags('/')
 @Controller('')
 export class AppController {
@@ -14,6 +16,12 @@ export class AppController {
   })
   @Get('databaseSync')
   async databaseSync(@Query('fromDate') fromDate: Date) {
+    return await this.appService.syncDatabse(fromDate);
+  }
+
+  @Get('/databaseSyncMinutes')
+  async minutesSync(@Query('minutes') minutes: number) {
+    const fromDate = moment().subtract(minutes,'minutes').toDate()
     return await this.appService.syncDatabse(fromDate);
   }
 

@@ -1,0 +1,15 @@
+cron:
+# staging
+- description: "Sync database"
+  url: /databaseSyncMinutes?minutes=2
+  schedule: every 1 mins
+  target: creatorpools-api-staging
+
+  # Production
+- description: "Sync database"
+  url: /databaseSyncMinutes?minutes=2
+  schedule: every 1 mins
+  target: default
+
+
+
