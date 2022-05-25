@@ -71,6 +71,16 @@ export class StakeService {
     });
   }
 
+  async activeStakes(wallet: string): Promise<Stake[]> {
+    const currentDate = new Date()
+    const stakes = this.stakeModel.find({
+      wallet,
+      stakedAt: {$lte: currentDate},
+      stakedUntil: {$gt: currentDate}
+    }).populate('plan').populate('pool')
+    return stakes
+  }
+
   async topCreatorPools(): Promise<TopStakedPools[]> {
     const pools: TopStakedPools[] = await this.stakeModel.aggregate([
       {
@@ -99,8 +109,6 @@ export class StakeService {
     ])
     const populated: TopStakedPools[] = await this.aggregatedPool.populate(pools, { path: 'pool', model: 'Pool' });
     return populated;
-    // const populated = await this.stakeModel.populate(pools, { path: 'pool', model: 'Pool' })
-    // return populated
   }
 
   async latestStakes(latest: number): Promise<Stake[]> {
@@ -109,5 +117,52 @@ export class StakeService {
 
   async highestPositions(latest: number): Promise<Stake[]> {
     return await this.stakeModel.find({ collected: false }).sort({amount: -1}).limit(latest);
+  }
+
+  async totalCurrentlyStaked(): Promise<number> {
+    const total = await this.stakeModel.aggregate([
+      {
+        '$match': {
+          'collected': false
+        }
+      },
+      {
+        '$group': {
+          _id: null,
+          'totalAmount': {
+            '$sum': '$amount'
+          }
+        }
+      }, {
+        '$project': {
+          '_id': 0, 
+          'totalAmount': '$totalAmount'
+        }
+      }
+    ])
+    
+    if (total.length > 0) return total[0].totalAmount
+    return 0
+  }
+
+  async totalStaked(): Promise<number> {
+    const total = await this.stakeModel.aggregate([
+      {
+        '$group': {
+          _id: null,
+          'totalAmount': {
+            '$sum': '$amount'
+          }
+        }
+      }, {
+        '$project': {
+          '_id': 0, 
+          'totalAmount': '$totalAmount'
+        }
+      }
+    ])
+    
+    if (total.length > 0) return total[0].totalAmount
+    return 0
   }
 }

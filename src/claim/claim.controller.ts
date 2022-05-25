@@ -13,6 +13,11 @@ export class ClaimController {
     return this.claimService.findAll();
   }
 
+  @Get('totalRewards')
+  getTotalRewards(): Promise<number> {
+    return this.claimService.totalClaimed();
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string) {
     return this.claimService.findOne(id);

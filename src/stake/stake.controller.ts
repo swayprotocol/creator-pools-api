@@ -42,8 +42,23 @@ export class StakeController {
     return this.stakeService.highestPositions(limit ? limit : 10);
   }
 
+  @Get('/totalCurrentlyStaked')
+  getTotalCurrentlyStaked(): Promise<number> {
+    return this.stakeService.totalCurrentlyStaked();
+  }
+
+  @Get('/totalStaked')
+  getTotalStaked(): Promise<number> {
+    return this.stakeService.totalStaked();
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Stake> {
     return this.stakeService.findOne(id);
+  }
+
+  @Get('/activeStakes/:wallet')
+  getActiveStakes(@Param('wallet') wallet: string):Promise<Stake[]> {
+    return this.stakeService.activeStakes(wallet)
   }
 }

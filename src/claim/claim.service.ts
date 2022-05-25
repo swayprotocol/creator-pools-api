@@ -12,8 +12,6 @@ export class ClaimService {
 
   constructor(
     @InjectModel('Claim') private readonly claimModel: Model<Claim>,
-    private readonly poolService: PoolService,
-    private readonly unstakeService: UnstakeService,
   ) {}
 
   async create(createClaimDto: CreateClaimDto): Promise<Claim> {
@@ -52,5 +50,26 @@ export class ClaimService {
     })
 
     return claims;
+  }
+
+  async totalClaimed(): Promise<number> {
+    const total = await this.claimModel.aggregate([
+      {
+        '$group': {
+          _id: null,
+          'totalAmount': {
+            '$sum': '$amount'
+          }
+        }
+      }, {
+        '$project': {
+          '_id': 0, 
+          'totalAmount': '$totalAmount'
+        }
+      }
+    ])
+    
+    if (total.length > 0) return total[0].totalAmount
+    return 0
   }
 }

@@ -31,6 +31,15 @@ export class PlanController {
   @Get('/onBlockchain')
   getPlansBC(@Query('name') name: string): Promise<Plan[]>{
     return this.planService.getPlansBc(name);
+
+  @Get('/active')
+  getActive(): Promise<Plan[]> {
+    return this.planService.getActive()
+  }
+
+  @Get('/maxApy')
+  getMaxApy(): Promise<Plan> {
+    return this.planService.getMaxApy()
   }
 
   @Get(':id')
