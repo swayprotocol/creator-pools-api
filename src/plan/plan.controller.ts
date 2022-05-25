@@ -31,6 +31,7 @@ export class PlanController {
   @Get('/onBlockchain')
   getPlansBC(@Query('name') name: string): Promise<Plan[]>{
     return this.planService.getPlansBc(name);
+  }
 
   @Get('/active')
   getActive(): Promise<Plan[]> {
