@@ -14,9 +14,6 @@ export class CreateStakeDto {
   @IsDate()
   stakedAt: Date;
 
-  @IsDate()
-  stakedUntil: Date;
-
   @IsString()
   wallet: string;
 

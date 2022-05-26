@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { utils } from 'ethers';
-import moment from 'moment';
 import { ClaimService } from './claim/claim.service';
 import { PlanService } from './plan/plan.service';
 import { PoolService } from './pool/pool.service';
@@ -72,7 +71,6 @@ export class AppService {
         pool: pools[stake.poolHandle],
         amount: parseFloat(utils.formatEther(stake.amount)),
         stakedAt: stake.block_timestamp,
-        stakedUntil: moment(stake.block_timestamp).add(plan.lockMonths,'M').toDate(),
         wallet: stake.sender,
         hash: stake.transaction_hash
       })
@@ -114,7 +112,7 @@ export class AppService {
     for await (const unstake of moralisUnstakes) {
       const pool = pools[unstake.poolHandle]
       
-      const stakes = await this.stakeService.findStakedUntil(unstake.recipient, pool);
+      const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
       const stakeIDs = stakes.map(stake => {return stake._id});
       await this.stakeService.collect(stakeIDs);
       await this.claimService.findAndCollect(unstake.recipient, pool._id);

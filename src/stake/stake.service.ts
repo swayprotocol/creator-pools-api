@@ -21,8 +21,8 @@ export class StakeService {
     const stake = new this.stakeModel({
       plan: createStakeDto.plan,
       pool: createStakeDto.pool,
-      stakedAt: new Date(),
-      stakedUntil: moment().add(plan.lockMonths,'months').toDate(),
+      stakedAt: createStakeDto.stakedAt,
+      stakedUntil: plan ? moment(createStakeDto.stakedAt).add(plan.lockMonths,'M').toDate() : null,
       amount: createStakeDto.amount,
       wallet: createStakeDto.wallet,
       hash: createStakeDto.hash,
@@ -76,7 +76,7 @@ export class StakeService {
     const stakes = this.stakeModel.find({
       wallet,
       stakedAt: {$lte: currentDate},
-      stakedUntil: {$gt: currentDate}
+      collected: false,
     }).populate('plan').populate('pool')
     return stakes
   }
@@ -112,11 +112,21 @@ export class StakeService {
   }
 
   async latestStakes(latest: number): Promise<Stake[]> {
-    return await this.stakeModel.find({ collected: false }).sort({stakedAt: -1}).limit(latest);
+    return await this.stakeModel
+      .find({ collected: false })
+      .sort({stakedAt: -1})
+      .limit(latest)
+      .populate('plan')
+      .populate('pool');
   }
 
   async highestPositions(latest: number): Promise<Stake[]> {
-    return await this.stakeModel.find({ collected: false }).sort({amount: -1}).limit(latest);
+    return await this.stakeModel
+      .find({ collected: false })
+      .sort({amount: -1})
+      .limit(latest)
+      .populate('plan')
+      .populate('pool');
   }
 
   async totalCurrentlyStaked(): Promise<number> {
