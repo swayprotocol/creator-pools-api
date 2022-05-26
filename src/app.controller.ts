@@ -28,7 +28,7 @@ export class AppController {
   @Get('/databaseSyncMinutes')
   async minutesSync(@Query('minutes') minutes: number) {
     if (!minutes) minutes=10
-    if (minutes < 1 || 1680 < minutes) throw new HttpException('Parameter exceeds its limit', HttpStatus.BAD_REQUEST)
+    if (minutes < 1 || minutes > 1680) throw new HttpException('Parameter exceeds its limit', HttpStatus.BAD_REQUEST)
     const fromDate = moment().subtract(minutes,'minutes').toDate()
     return await this.appService.syncDatabse(fromDate);
   }
