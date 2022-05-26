@@ -21,8 +21,8 @@ export class StakeService {
     const stake = new this.stakeModel({
       plan: createStakeDto.plan,
       pool: createStakeDto.pool,
-      stakedAt: new Date(),
-      stakedUntil: moment().add(plan.lockMonths,'months').toDate(),
+      stakedAt: createStakeDto.stakedAt,
+      stakedUntil: plan ? moment(createStakeDto.stakedAt).add(plan.lockMonths,'M').toDate() : null,
       amount: createStakeDto.amount,
       wallet: createStakeDto.wallet,
       hash: createStakeDto.hash,
