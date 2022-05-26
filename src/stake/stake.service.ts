@@ -76,7 +76,7 @@ export class StakeService {
     const stakes = this.stakeModel.find({
       wallet,
       stakedAt: {$lte: currentDate},
-      stakedUntil: {$gt: currentDate}
+      collected: false,
     }).populate('plan').populate('pool')
     return stakes
   }
@@ -112,11 +112,21 @@ export class StakeService {
   }
 
   async latestStakes(latest: number): Promise<Stake[]> {
-    return await this.stakeModel.find({ collected: false }).sort({stakedAt: -1}).limit(latest);
+    return await this.stakeModel
+      .find({ collected: false })
+      .sort({stakedAt: -1})
+      .limit(latest)
+      .populate('plan')
+      .populate('pool');
   }
 
   async highestPositions(latest: number): Promise<Stake[]> {
-    return await this.stakeModel.find({ collected: false }).sort({amount: -1}).limit(latest);
+    return await this.stakeModel
+      .find({ collected: false })
+      .sort({amount: -1})
+      .limit(latest)
+      .populate('plan')
+      .populate('pool');
   }
 
   async totalCurrentlyStaked(): Promise<number> {
