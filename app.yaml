@@ -7,3 +7,7 @@ automatic_scaling:
   max_idle_instances: 1
   target_cpu_utilization: 0.7
   max_concurrent_requests: 40
+
+vpc_access_connector:
+  name: projects/swaysocial-one-pager/locations/europe-west1/connectors/app-engine-eu-w
+  egress_setting: all-traffic
