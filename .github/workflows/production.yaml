@@ -1,14 +1,14 @@
-name: Staging deployment
+name: Production deployment
 
 
 on:
   push:
     branches: 
-      - staging
+      - main
 
 jobs:
   build:
-    name: Build api - Staging
+    name: Build api - Production
     runs-on: ubuntu-latest
 
     steps:
@@ -23,15 +23,15 @@ jobs:
       
       - name: Create env file for API
         env:
-          ENV_FILE: ${{ secrets.ENV_API_STAGING }}
+          ENV_FILE: ${{ secrets.ENV_API_PRODUCTION }}
         run: |
           echo $ENV_FILE | base64 --decode > .env
         
       - run: yarn predeploy
             
-  deploy_app_staging:
+  deploy_app_production:
       needs: [build]
-      name: Deploy api - Staging
+      name: Deploy api - Production
       runs-on: ubuntu-latest
       permissions:
         contents: read
@@ -45,5 +45,4 @@ jobs:
         - name: Deploy to GAE
           run: |-
             gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
-            gcloud app deploy app-staging.yaml --version=staging --quiet
-
+            gcloud app deploy app.yaml --version=production --quiet
