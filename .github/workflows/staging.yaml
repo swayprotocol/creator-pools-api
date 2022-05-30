@@ -7,30 +7,7 @@ on:
       - staging
 
 jobs:
-  build:
-    name: Build api - Staging
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
-        with:
-            node-version: '14'
-            cache: 'yarn'
-            cache-dependency-path: yarn.lock
-            
-      - run: yarn
-      
-      - name: Create env file for API
-        env:
-          ENV_FILE: ${{ secrets.ENV_API_STAGING }}
-        run: |
-          echo $ENV_FILE | base64 --decode > .env
-        
-      - run: yarn predeploy
-            
   deploy_app_staging:
-      needs: [build]
       name: Deploy api - Staging
       runs-on: ubuntu-latest
       permissions:
@@ -38,6 +15,12 @@ jobs:
         id-token: write
       steps:
         - uses: actions/checkout@v2
+
+        - name: Create env file for API
+          env:
+            ENV_FILE: ${{ secrets.ENV_API_STAGING }}
+          run: |
+            echo $ENV_FILE | base64 --decode > .env
         
         - uses: google-github-actions/setup-gcloud@v0
           with:
