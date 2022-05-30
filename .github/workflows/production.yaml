@@ -1,0 +1,48 @@
+name: Production deployment
+
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  build:
+    name: Build api - Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+            node-version: '14'
+            cache: 'yarn'
+            cache-dependency-path: yarn.lock
+            
+      - run: yarn
+      
+      - name: Create env file for API
+        env:
+          ENV_FILE: ${{ secrets.ENV_API_PRODUCTION }}
+        run: |
+          echo $ENV_FILE | base64 --decode > .env
+        
+      - run: yarn predeploy
+            
+  deploy_app_production:
+      needs: [build]
+      name: Deploy api - Production
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        id-token: write
+      steps:
+        - uses: actions/checkout@v2
+        
+        - uses: google-github-actions/setup-gcloud@v0
+          with:
+            project_id: ${{ secrets.GCP_PROJECT }}
+        - name: Deploy to GAE
+          run: |-
+            gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+            gcloud app deploy app.yaml --version=production --quiet
