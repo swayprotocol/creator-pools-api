@@ -17,6 +17,9 @@ async function bootstrap() {
   SwaggerModule.setup('/', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({
+    origin: ['https://creatorpools.live/', 'https://staging.creatorpools.live/', 'http://localhost:3000']
+  });
   
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
