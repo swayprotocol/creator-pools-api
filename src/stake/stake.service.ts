@@ -6,7 +6,9 @@ import { Stake } from './entities/stake.entity';
 import { CreateStakeDto } from './dto/create-stake.dto';
 import { PlanService } from '../plan/plan.service';
 import { TopStakedPools } from './dto/topStakedPools.dto';
-import { Pool } from 'src/pool/entities/pool.entity';
+import { Pool } from '../pool/entities/pool.entity';
+import { PoolService } from '../pool/pool.service';
+import { ActiveStakesPool } from './entities/activeStakesPool';
 
 @Injectable()
 export class StakeService {
@@ -14,6 +16,7 @@ export class StakeService {
     @InjectModel('Stake') private readonly stakeModel: Model<Stake>,
     @InjectModel('AggregatedPool') private readonly aggregatedPool: Model<TopStakedPools>,
     private readonly planService: PlanService,
+    private readonly poolService: PoolService,
   ){}
 
   async create(createStakeDto: CreateStakeDto): Promise<Stake> {
@@ -79,6 +82,45 @@ export class StakeService {
       collected: false,
     }).populate('plan').populate('pool')
     return stakes
+  }
+
+  async activeStakesPool(poolName: string, wallet: string): Promise<ActiveStakesPool> {
+    const pool = await this.poolService.findOneByHandle(poolName)
+    console.log(poolName, wallet)
+    let stakes: Stake[] = await this.stakeModel.find(
+    wallet ? {
+      wallet,
+      pool,
+      collected: false
+    }:{
+      pool,
+      collected: false
+    }).populate('plan')
+
+    let members = []
+    let averageAPY = 0
+    let totalAmount = 0
+    let totalFarmed = 0
+
+    stakes.map(stake => {
+      if(!members.includes(stake.wallet)) members.push(stake.wallet)
+      totalAmount += stake.amount
+      averageAPY += stake.plan?.apy
+      totalFarmed += stake.farmed
+    })
+    averageAPY = averageAPY / stakes.length
+
+    return {
+      social: poolName.split('-')[0],
+      poolHandle: poolName.split('-')[1],
+      totalAmount,
+      totalFarmed,
+      averageAPY,
+      members,
+      numberOfStakes: stakes.length,
+      pool,
+      stakes,
+    }
   }
 
   async topCreatorPools(): Promise<TopStakedPools[]> {

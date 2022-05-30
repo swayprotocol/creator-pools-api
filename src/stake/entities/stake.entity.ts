@@ -11,4 +11,5 @@ export class Stake {
   wallet: string;
   collected: boolean;
   hash: string;
+  farmed?: number;
 }

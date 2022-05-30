@@ -4,6 +4,7 @@ import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TopStakedPools } from './dto/topStakedPools.dto';
+import { ActiveStakesPool } from './entities/activeStakesPool';
 
 @ApiTags('stake')
 @Controller('stake')
@@ -52,13 +53,31 @@ export class StakeController {
     return this.stakeService.totalStaked();
   }
 
+  @ApiQuery({
+    name: 'poolName',
+    type: String,
+    description: 'Pool name with its handle example: "ig-clout.art"',
+    required: true
+  })
+  @ApiQuery({
+    name: 'wallet',
+    type: String,
+    description: 'If you provide wallet it show only users stakes in pool',
+    required: false
+  })
+  @Get('/activeStakesPool')
+  getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
+    console.log('a smo sploh kle')
+    return this.stakeService.activeStakesPool(poolName, wallet);
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Stake> {
     return this.stakeService.findOne(id);
   }
 
   @Get('/activeStakes/:wallet')
-  getActiveStakes(@Param('wallet') wallet: string):Promise<Stake[]> {
+  getActiveStakes(@Param('wallet') wallet: string): Promise<Stake[]> {
     return this.stakeService.activeStakes(wallet)
   }
 }

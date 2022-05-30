@@ -3,8 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateClaimDto } from './dto/create-claim.dto';
 import { Claim } from './entities/claim.entity';
-import { PoolService } from '../pool/pool.service';
-import { UnstakeService } from '../unstake/unstake.service';
 
 
 @Injectable()
