@@ -39,14 +39,17 @@ jobs:
       steps:
         - uses: actions/checkout@v2
         
-        - id: 'google_auth'
-          uses: 'google-github-actions/auth@v0'
-          with:
-            credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
-
         - uses: google-github-actions/setup-gcloud@v0
           with:
             project_id: ${{ secrets.GCP_PROJECT }}
+
+        - name: Auth with Google Cloud
+          id: auth
+          uses: google-github-actions/auth@v0.4.2
+          with:
+            workload_identity_provider: 'projects/969357121066/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+            service_account: 'github-actions@swaysocial-one-pager.iam.gserviceaccount.com'
+
         - name: Deploy to GAE
           run: |-
             gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
