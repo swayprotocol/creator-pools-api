@@ -86,7 +86,7 @@ export class StakeService {
 
   async activeStakesPool(poolName: string, wallet: string): Promise<ActiveStakesPool> {
     const pool = await this.poolService.findOneByHandle(poolName)
-    console.log(poolName, wallet)
+
     let stakes: Stake[] = await this.stakeModel.find(
     wallet ? {
       wallet,
