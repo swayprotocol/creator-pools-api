@@ -53,6 +53,11 @@ export class StakeController {
     return this.stakeService.totalStaked();
   }
 
+  @Get('/chanelDistribution')
+  getChanelDistribution() {
+    return this.stakeService.chanelDistribution();
+  }
+
   @ApiQuery({
     name: 'poolName',
     type: String,

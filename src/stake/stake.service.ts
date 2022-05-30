@@ -74,6 +74,30 @@ export class StakeService {
     });
   }
 
+  async chanelDistribution() {
+    const stakes: Stake[] = await this.stakeModel.find({
+      collected: false,
+    }).populate('pool')
+
+    const distribution = {}
+
+    for (const stake of stakes) {
+      const poolSplit = stake.pool.creator.split('-')
+      if (poolSplit.length == 2) {
+        const chanel = poolSplit[0]
+        if (distribution[chanel]) distribution[chanel] += stake.amount
+        else distribution[chanel] = stake.amount
+      }
+    }
+
+    const distributionArray = []
+    for (const chanel in distribution) {
+      distributionArray.push({chanel, staked: distribution[chanel]})
+    }
+
+    return distributionArray
+  }
+
   async activeStakes(wallet: string): Promise<Stake[]> {
     const currentDate = new Date()
     const stakes = this.stakeModel.find({
