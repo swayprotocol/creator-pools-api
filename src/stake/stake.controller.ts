@@ -72,7 +72,6 @@ export class StakeController {
   })
   @Get('/activeStakesPool')
   getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
-    console.log('a smo sploh kle')
     return this.stakeService.activeStakesPool(poolName, wallet);
   }
 
