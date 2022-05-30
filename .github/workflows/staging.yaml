@@ -7,9 +7,8 @@ on:
       - staging
 
 jobs:
-  deploy_app_staging:
-      needs: [build]
-      name: Deploy api - Staging
+  deploy_api_staging:
+      name: Deploy API - Staging
       runs-on: ubuntu-latest
       permissions:
         contents: read
