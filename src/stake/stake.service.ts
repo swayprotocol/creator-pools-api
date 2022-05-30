@@ -75,6 +75,7 @@ export class StakeService {
   }
 
   async chanelDistribution() {
+    const totalStaked = await this.totalCurrentlyStaked()
     const stakes: Stake[] = await this.stakeModel.find({
       collected: false,
     }).populate('pool')
@@ -92,7 +93,7 @@ export class StakeService {
 
     const distributionArray = []
     for (const chanel in distribution) {
-      distributionArray.push({chanel, staked: distribution[chanel]})
+      distributionArray.push({chanel, distribution: (distribution[chanel]/totalStaked). toFixed(3)})
     }
 
     return distributionArray
