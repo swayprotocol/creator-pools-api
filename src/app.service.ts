@@ -9,6 +9,12 @@ import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { MoralisStakeService } from './_moralis/stake/stake.service';
 import { MoralisClaimService } from './_moralis/claim/claim.service';
 import { MoralisUnstakeService } from './_moralis/unstake/unstake.service';
+import './shared/configs/productionConfig.json';
+import './shared/abis/production/staking-abi.json';
+import './shared/abis/production/token-abi.json';
+import './shared/configs/stagingConfig.json';
+import './shared/abis/staging/staking-abi.json';
+import './shared/abis/staging/token-abi.json';
 
 @Injectable()
 export class AppService {
