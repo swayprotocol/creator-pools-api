@@ -9,6 +9,7 @@ import { TopStakedPools } from './dto/topStakedPools.dto';
 import { Pool } from '../pool/entities/pool.entity';
 import { PoolService } from '../pool/pool.service';
 import { ActiveStakesPool } from './entities/activeStakesPool';
+import { isNumber } from 'class-validator';
 
 @Injectable()
 export class StakeService {
@@ -86,16 +87,16 @@ export class StakeService {
       const poolSplit = stake.pool.creator.split('-')
       if (poolSplit.length == 2) {
         const chanel = poolSplit[0]
-        if (distribution[chanel]) distribution[chanel] += stake.amount
-        else distribution[chanel] = stake.amount
+        if (!distribution[chanel]) distribution[chanel] = 0
+        distribution[chanel] += stake.amount
       }
     }
 
     const distributionArray = []
     for (const chanel in distribution) {
-      distributionArray.push({chanel, distribution: (distribution[chanel]/totalStaked). toFixed(3)})
+      const chanelDistribution = isNumber(distribution[chanel]/totalStaked) ? distribution[chanel]/totalStaked : 0.000
+      distributionArray.push({chanel, distribution: (chanelDistribution).toFixed(3)})
     }
-
     return distributionArray
   }
 
