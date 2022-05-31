@@ -135,9 +135,12 @@ export class StakeService {
     })
     averageAPY = averageAPY / stakes.length
 
+    const poolSplit = pool?.creator.split('-')
+    const social = poolSplit?.length == 2 ? poolSplit[0] : null
+    const poolHandle = poolSplit?.length == 2 ? poolSplit[1] : null
     return {
-      social: poolName.split('-')[0],
-      poolHandle: poolName.split('-')[1],
+      social,
+      poolHandle,
       totalAmount,
       totalFarmed,
       averageAPY,
