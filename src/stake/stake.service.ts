@@ -75,7 +75,7 @@ export class StakeService {
     });
   }
 
-  async chanelDistribution() {
+  async channelDistribution() {
     const totalStaked = await this.totalCurrentlyStaked()
     const stakes: Stake[] = await this.stakeModel.find({
       collected: false,
@@ -86,16 +86,16 @@ export class StakeService {
     for (const stake of stakes) {
       const poolSplit = stake.pool.creator.split('-')
       if (poolSplit.length == 2) {
-        const chanel = poolSplit[0]
-        if (!distribution[chanel]) distribution[chanel] = 0
-        distribution[chanel] += stake.amount
+        const channel = poolSplit[0]
+        if (!distribution[channel]) distribution[channel] = 0
+        distribution[channel] += stake.amount
       }
     }
 
     const distributionArray = []
-    for (const chanel in distribution) {
-      const chanelDistribution = isNumber(distribution[chanel]/totalStaked) ? distribution[chanel]/totalStaked : 0.000
-      distributionArray.push({chanel, distribution: (chanelDistribution).toFixed(3)})
+    for (const channel in distribution) {
+      const channelDistribution = isNumber(distribution[channel]/totalStaked) ? distribution[channel]/totalStaked : 0.000
+      distributionArray.push({channel, distribution: (channelDistribution).toFixed(3)})
     }
     return distributionArray
   }

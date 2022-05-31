@@ -53,9 +53,9 @@ export class StakeController {
     return this.stakeService.totalStaked();
   }
 
-  @Get('/chanelDistribution')
-  getChanelDistribution() {
-    return this.stakeService.chanelDistribution();
+  @Get('/channelDistribution')
+  getchannelDistribution() {
+    return this.stakeService.channelDistribution();
   }
 
   @ApiQuery({
