@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query} from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Query} from '@nestjs/common';
 import { StakeService } from './stake.service';
 import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
@@ -71,8 +71,22 @@ export class StakeController {
     required: false
   })
   @Get('/activeStakesPool')
-  getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
-    return this.stakeService.activeStakesPool(poolName, wallet);
+  async getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
+    const activeStakes = await this.stakeService.activeStakesPool(poolName, wallet.toLowerCase());
+    if (!activeStakes.poolHandle) throw new HttpException('Pool not found', HttpStatus.NOT_FOUND)
+    return activeStakes
+  }
+
+  @ApiQuery({
+    name: 'wallet',
+    type: String,
+    description: 'All active stake by wallet',
+    required: true
+  })
+  @Get('/activeStakesWallet')
+  async getActiveStakesWallet(@Query('wallet') wallet: string): Promise<ActiveStakesPool[]> {
+    if (!wallet) throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND)
+    return this.stakeService.activeStakesPools(wallet.toLowerCase())
   }
 
   @Get(':id')
@@ -80,8 +94,8 @@ export class StakeController {
     return this.stakeService.findOne(id);
   }
 
-  @Get('/activeStakes/:wallet')
+  @Get('/allActiveStakes/:wallet')
   getActiveStakes(@Param('wallet') wallet: string): Promise<Stake[]> {
-    return this.stakeService.activeStakes(wallet)
+    return this.stakeService.activeStakes(wallet.toLowerCase())
   }
 }

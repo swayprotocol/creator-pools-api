@@ -110,6 +110,31 @@ export class StakeService {
     return stakes
   }
 
+  async activeStakesPools(wallet: string){
+    const activeStakesPools: ActiveStakesPool[] = []
+    const stakedPools = await this.stakeModel.aggregate([
+      {
+        $match: {
+          collected: false,
+          wallet
+        }
+      },
+      {
+        $group: {
+          _id: '$pool'
+        }
+      }
+    ])
+
+    for await(const poolId of stakedPools) {
+      const pool = await this.poolService.findOne(poolId._id)
+      const activeStakesPool = await this.activeStakesPool(pool.creator, wallet)
+      activeStakesPools.push(activeStakesPool)
+    }
+
+    return activeStakesPools
+  }
+
   async activeStakesPool(poolName: string, wallet: string): Promise<ActiveStakesPool> {
     const pool = await this.poolService.findOneByHandle(poolName)
 
