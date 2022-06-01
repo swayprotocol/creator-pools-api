@@ -72,7 +72,8 @@ export class StakeController {
   })
   @Get('/activeStakesPool')
   async getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
-    const activeStakes = await this.stakeService.activeStakesPool(poolName, wallet.toLowerCase());
+    if (wallet) wallet = wallet.toLowerCase()
+    const activeStakes = await this.stakeService.activeStakesPool(poolName, wallet);
     if (!activeStakes.poolHandle) throw new HttpException('Pool not found', HttpStatus.NOT_FOUND)
     return activeStakes
   }

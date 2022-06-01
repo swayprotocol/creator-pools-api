@@ -110,13 +110,13 @@ export class StakeService {
     return stakes
   }
 
-  async activeStakesPools(wallet: string){
+  async activeStakesPools(wallet: string): Promise<ActiveStakesPool[]>{
     const activeStakesPools: ActiveStakesPool[] = []
     const stakedPools = await this.stakeModel.aggregate([
       {
         $match: {
           collected: false,
-          wallet
+          wallet: { $regex: wallet, $options: 'i' }
         }
       },
       {
@@ -140,7 +140,7 @@ export class StakeService {
 
     let stakes: Stake[] = await this.stakeModel.find(
     wallet ? {
-      wallet,
+      wallet: { $regex: wallet, $options: 'i' },
       pool,
       collected: false
     }:{
@@ -153,23 +153,41 @@ export class StakeService {
     let totalAmount = 0
     let totalFarmed = 0
 
+    let walletStakesCount = 0
+    let walletTotalAmount = 0
+    let walletAverageAPY = 0
+    let walletFarmed = 0
+
     stakes.map(stake => {
       if(!members.includes(stake.wallet)) members.push(stake.wallet)
       totalAmount += stake.amount
       averageAPY += stake.plan?.apy
       totalFarmed += stake.farmed
+
+      if(stake.wallet === wallet) {
+        walletTotalAmount += stake.amount
+        walletAverageAPY = stake.plan?.apy
+        walletFarmed += stake.farmed
+        walletStakesCount += 1
+      }
     })
     averageAPY = averageAPY / stakes.length
+    walletAverageAPY = averageAPY / walletStakesCount
 
     const poolSplit = pool?.creator.split('-')
     const social = poolSplit?.length == 2 ? poolSplit[0] : null
     const poolHandle = poolSplit?.length == 2 ? poolSplit[1] : null
+
     return {
       social,
       poolHandle,
       totalAmount,
       totalFarmed,
       averageAPY,
+      walletTotalAmount,
+      walletAverageAPY,
+      walletFarmed,
+      walletStakesCount,
       members,
       numberOfStakes: stakes.length,
       pool,
