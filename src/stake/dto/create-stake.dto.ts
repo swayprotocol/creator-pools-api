@@ -3,9 +3,6 @@ import { IsDate, IsMongoId, IsNumber, IsString } from 'class-validator';
 
 export class CreateStakeDto {
   @IsMongoId()
-  plan: string;
-  
-  @IsMongoId()
   pool: string;
 
   @IsNumber()

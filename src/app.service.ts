@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { utils } from 'ethers';
 import { ClaimService } from './claim/claim.service';
-import { PlanService } from './plan/plan.service';
 import { PoolService } from './pool/pool.service';
 import { StakeService } from './stake/stake.service';
 import { UnstakeService } from './unstake/unstake.service';
@@ -14,7 +13,6 @@ import { MoralisUnstakeService } from './_moralis/unstake/unstake.service';
 export class AppService {
 
   constructor(
-    private readonly planService: PlanService,
     private readonly poolService: PoolService,
     private readonly claimService: ClaimService,
     private readonly stakeService: StakeService,
@@ -58,16 +56,12 @@ export class AppService {
 
     const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes, fromDate);
 
-    const plansArray = await this.planService.findAll();
-    const plans = Object.assign({}, ...plansArray.map((x) => ({[x.blockchainIndex]: x._id})));
     const poolsArray = await this.poolService.findAll();
     const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
     for await (const stake of moralisStakes) {
-      const plan = plans[stake.planId]
 
       await this.stakeService.create({
-        plan: plan,
         pool: pools[stake.poolHandle],
         amount: parseFloat(utils.formatEther(stake.amount)),
         stakedAt: stake.block_timestamp,

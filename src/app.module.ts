@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MONGO_URL, MORALIS_URL } from './config';
-import { PlanModule } from './plan/plan.module';
 import { PoolModule } from './pool/pool.module';
 import { StakeModule } from './stake/stake.module';
 import { ClaimModule } from './claim/claim.module';
@@ -20,7 +19,6 @@ const moralisDB = MongooseModule.forRoot(MORALIS_URL, {connectionName: 'moralisD
   imports: [
     ourDB, 
     moralisDB, 
-    PlanModule, 
     PoolModule, 
     StakeModule, 
     ClaimModule, 
