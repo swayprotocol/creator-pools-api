@@ -9,5 +9,6 @@ export const {
   STAKING_CONTRACT_ADDRESS,
   SWAY_TOKEN_ADDRESS,
   STAKING_ABI,
-  CONFIG
+  CONFIG,
+  APY
 } = process.env;
