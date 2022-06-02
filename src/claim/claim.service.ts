@@ -35,7 +35,7 @@ export class ClaimService {
 
   async findAndCollect(wallet: string, poolId: string): Promise<Claim[]> {
     const claims = await this.claimModel.find({
-      wallet,
+      wallet: wallet.toLowerCase(),
       pool: poolId,
       unstaked: false,
     });
@@ -61,12 +61,12 @@ export class ClaimService {
         }
       }, {
         '$project': {
-          '_id': 0, 
+          '_id': 0,
           'totalAmount': '$totalAmount'
         }
       }
     ])
-    
+
     if (total.length > 0) return total[0].totalAmount
     return 0
   }
