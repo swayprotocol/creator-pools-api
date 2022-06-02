@@ -51,7 +51,7 @@ export class StakeService {
 
   async findUncollected(wallet: string, pool: Pool): Promise<Stake[]> {
     const stakes = await this.stakeModel.find({
-      wallet,
+      wallet: wallet.toLowerCase(),
       pool,
       collected: false,
     })
@@ -60,7 +60,7 @@ export class StakeService {
 
   async findStakedUntil(wallet: string, pool: Pool): Promise<Stake[]> {
     const stakes = await this.stakeModel.find({
-      wallet,
+      wallet: wallet.toLowerCase(),
       pool,
       stakedUntil: { $gt: new Date() }
     })
@@ -103,7 +103,7 @@ export class StakeService {
   async activeStakes(wallet: string): Promise<Stake[]> {
     const currentDate = new Date()
     const stakes = this.stakeModel.find({
-      wallet,
+      wallet: wallet.toLowerCase(),
       stakedAt: {$lte: currentDate},
       collected: false,
     }).populate('plan').populate('pool')
@@ -116,7 +116,7 @@ export class StakeService {
       {
         $match: {
           collected: false,
-          wallet: { $regex: wallet, $options: 'i' }
+          wallet: wallet.toLowerCase()
         }
       },
       {
@@ -137,13 +137,14 @@ export class StakeService {
 
   async activeStakesPool(poolName: string, wallet: string): Promise<ActiveStakesPool> {
     const pool = await this.poolService.findOneByHandle(poolName)
+    if (wallet) wallet = wallet.toLowerCase();
 
     let stakes: Stake[] = await this.stakeModel.find(
     wallet ? {
-      wallet: { $regex: wallet, $options: 'i' },
+      wallet: wallet,
       pool,
       collected: false
-    }:{
+    } : {
       pool,
       collected: false
     }).populate('plan')
@@ -204,7 +205,7 @@ export class StakeService {
       },
       {
         '$group': {
-          '_id': '$pool', 
+          '_id': '$pool',
           'totalAmount': {
             '$sum': '$amount'
           }
@@ -215,8 +216,8 @@ export class StakeService {
         }
       }, {
         '$project': {
-          '_id': 0, 
-          'pool': '$_id', 
+          '_id': 0,
+          'pool': '$_id',
           'totalAmount': '$totalAmount'
         }
       }
@@ -259,12 +260,12 @@ export class StakeService {
         }
       }, {
         '$project': {
-          '_id': 0, 
+          '_id': 0,
           'totalAmount': '$totalAmount'
         }
       }
     ])
-    
+
     if (total.length > 0) return total[0].totalAmount
     return 0
   }
@@ -280,12 +281,12 @@ export class StakeService {
         }
       }, {
         '$project': {
-          '_id': 0, 
+          '_id': 0,
           'totalAmount': '$totalAmount'
         }
       }
     ])
-    
+
     if (total.length > 0) return total[0].totalAmount
     return 0
   }

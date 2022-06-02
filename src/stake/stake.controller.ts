@@ -18,7 +18,7 @@ export class StakeController {
 
   @Get('/topStakedPools')
   topStakedPools(): Promise<TopStakedPools[]> {
-    return this.stakeService.topCreatorPools();  
+    return this.stakeService.topCreatorPools();
   }
 
   @ApiQuery({
@@ -72,7 +72,6 @@ export class StakeController {
   })
   @Get('/activeStakesPool')
   async getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
-    if (wallet) wallet = wallet.toLowerCase()
     const activeStakes = await this.stakeService.activeStakesPool(poolName, wallet);
     if (!activeStakes.poolHandle) throw new HttpException('Pool not found', HttpStatus.NOT_FOUND)
     return activeStakes
@@ -87,7 +86,7 @@ export class StakeController {
   @Get('/activeStakesWallet')
   async getActiveStakesWallet(@Query('wallet') wallet: string): Promise<ActiveStakesPool[]> {
     if (!wallet) throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND)
-    return this.stakeService.activeStakesPools(wallet.toLowerCase())
+    return this.stakeService.activeStakesPools(wallet)
   }
 
   @Get(':id')
@@ -97,6 +96,6 @@ export class StakeController {
 
   @Get('/allActiveStakes/:wallet')
   getActiveStakes(@Param('wallet') wallet: string): Promise<Stake[]> {
-    return this.stakeService.activeStakes(wallet.toLowerCase())
+    return this.stakeService.activeStakes(wallet)
   }
 }
