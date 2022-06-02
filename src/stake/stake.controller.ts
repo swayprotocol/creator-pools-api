@@ -44,18 +44,13 @@ export class StakeController {
   }
 
   @Get('/totalCurrentlyStaked')
-  getTotalCurrentlyStaked(): Promise<number> {
+  getTotalCurrentlyStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
     return this.stakeService.totalCurrentlyStaked();
   }
 
   @Get('/totalStaked')
-  getTotalStaked(): Promise<number> {
+  getTotalStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
     return this.stakeService.totalStaked();
-  }
-
-  @Get('/channelDistribution')
-  getchannelDistribution() {
-    return this.stakeService.channelDistribution();
   }
 
   @ApiQuery({
