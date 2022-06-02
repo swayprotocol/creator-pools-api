@@ -88,14 +88,21 @@
     },
     "hasAltTheme": true
   },
-  "token": {
+  "tokens": [{
     "address": "0xC572adFa04a9635232f1Be8085273b7063359FaC",
     "ticker": "SWAY",
     "logo": "/assets/favicon-137x137.png",
     "coingecko_coin_ticker": "sway-social",
     "exchange_url": "https://quickswap.exchange/#/swap?outputCurrency=0x262b8aa7542004f023b0eb02bc6b96350a02b728",
     "circulating_supply": 10917462
-  },
+  },{
+    "address": "0xd43be54c1aedf7ee4099104f2dae4ea88b18a249",
+    "ticker": "TRAXX",
+    "logo": "/assets/favicon-137x137.png",
+    "coingecko_coin_ticker": "traxx",
+    "exchange_url": "https://ascendex.com/en/cashtrade-spottrading/usdt/traxx",
+    "circulating_supply": 100
+  }],
   "staking": {
     "address": "0x440141a6325966a4fDecce951f449D0fC2581B60",
     "abi": "staking-abi.json",
