@@ -7,6 +7,7 @@ export class Stake {
   pool: Pool;
   stakedAt: Date;
   stakedUntil: Date;
+  token: string;
   amount: number;
   wallet: string;
   collected: boolean;

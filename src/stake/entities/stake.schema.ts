@@ -17,6 +17,9 @@ export const stakeSchema = new mongoose.Schema<Stake>({
   stakedUntil: {
     type: Date,
   },
+  token: {
+    type: String,
+  },
   amount: {
     type: Number,
   },
