@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ClaimService } from './claim.service';
 import { ValidateMongoId } from './../validators/MongoId';
 
@@ -13,6 +13,7 @@ export class ClaimController {
     return this.claimService.findAll();
   }
 
+  @ApiOperation({ summary: 'Rewards are always collected in SWAY token'})
   @Get('totalRewards')
   getTotalRewards(): Promise<number> {
     return this.claimService.totalClaimed();

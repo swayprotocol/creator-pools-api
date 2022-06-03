@@ -2,7 +2,7 @@ import { Controller, Get, HttpException, HttpStatus, Param, Query} from '@nestjs
 import { StakeService } from './stake.service';
 import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TopStakedPools } from './dto/topStakedPools.dto';
 import { ActiveStakesPool } from './entities/activeStakesPool';
 
@@ -16,6 +16,7 @@ export class StakeController {
     return this.stakeService.findAll();
   }
 
+  @ApiOperation({ summary: 'Pools ordered by most tokens staked'})
   @Get('/topStakedPools')
   topStakedPools(): Promise<TopStakedPools[]> {
     return this.stakeService.topCreatorPools();  
@@ -27,6 +28,7 @@ export class StakeController {
     description: "Optional parameter, default is 10",
     required: false
   })
+  @ApiOperation({ summary: 'Stakes ordered by date'})
   @Get('/latestStakes')
   latestStakes(@Query('limit') limit?: number): Promise<Stake[]> {
     return this.stakeService.latestStakes(limit ? limit : 10);
@@ -38,16 +40,19 @@ export class StakeController {
     description: "Optional parameter, default is 10",
     required: false
   })
+  @ApiOperation({ summary: 'Stakes ordered by tokens staked'})
   @Get('/highestPositions')
   highestPositions(@Query('limit') limit?: number): Promise<Stake[]> {
     return this.stakeService.highestPositions(limit ? limit : 10);
   }
 
+  @ApiOperation({ summary: 'Total tokens currently staked on this smartcontract'})
   @Get('/totalCurrentlyStaked')
   getTotalCurrentlyStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
     return this.stakeService.totalCurrentlyStaked();
   }
 
+  @ApiOperation({ summary: 'Total tokens staked on this smartcontract'})
   @Get('/totalStaked')
   getTotalStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
     return this.stakeService.totalStaked();
@@ -56,7 +61,7 @@ export class StakeController {
   @ApiQuery({
     name: 'poolName',
     type: String,
-    description: 'Pool name with its handle example: "ig-clout.art"',
+    description: 'Pool name with its handle example: "0xasd2asad2asd2...."',
     required: true
   })
   @ApiQuery({
@@ -65,6 +70,7 @@ export class StakeController {
     description: 'If you provide wallet it show only users stakes in pool',
     required: false
   })
+  @ApiOperation({ summary: 'All active stakes in pool, if wallet provided filter by wallet'})
   @Get('/activeStakesPool')
   async getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
     if (wallet) wallet = wallet.toLowerCase()
@@ -76,9 +82,9 @@ export class StakeController {
   @ApiQuery({
     name: 'wallet',
     type: String,
-    description: 'All active stake by wallet',
     required: true
   })
+  @ApiOperation({ summary: 'All active stakes by wallet grouped by pools'})
   @Get('/activeStakesWallet')
   async getActiveStakesWallet(@Query('wallet') wallet: string): Promise<ActiveStakesPool[]> {
     if (!wallet) throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND)
@@ -90,6 +96,7 @@ export class StakeController {
     return this.stakeService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'All active stakes in all pools by wallet'})
   @Get('/allActiveStakes/:wallet')
   getActiveStakes(@Param('wallet') wallet: string): Promise<Stake[]> {
     return this.stakeService.activeStakes(wallet.toLowerCase())
