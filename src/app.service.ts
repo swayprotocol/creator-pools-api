@@ -85,7 +85,7 @@ export class AppService {
       await this.claimService.create({
         wallet: claim.recipient,
         pool: pools[claim.poolHandle],
-        amount: parseFloat(utils.formatEther(claim.amount)),
+        amount: parseFloat(utils.formatEther(claim.swayAmount)),
         claimDate: claim.block_timestamp,
         hash: claim.transaction_hash,
         unstaked: false
@@ -108,7 +108,7 @@ export class AppService {
       
       const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
       const stakeIDs = stakes.map(stake => {return stake._id});
-      await this.stakeService.collect(stakeIDs);
+      await this.stakeService.collect(stakeIDs, unstake.block_timestamp);
       await this.claimService.findAndCollect(unstake.recipient, pool._id);
       
       await this.unstakeService.create({
