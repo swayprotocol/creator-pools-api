@@ -18,7 +18,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: ['https://creatorpools.live/', 'https://staging.creatorpools.live/', 'http://localhost:3000']
+    origin: [
+      'https://creatorpools.live', 
+      'https://staging.creatorpools.live',
+      'http://localhost:3000'
+    ]
   });
   
   await app.listen(port);
