@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import moment from 'moment';
 import { Stake } from './entities/stake.entity';
 import { CreateStakeDto } from './dto/create-stake.dto';
 import { TopStakedPools } from './dto/topStakedPools.dto';
@@ -48,20 +47,12 @@ export class StakeService {
     return stakes;
   }
 
-  async findStakedUntil(wallet: string, pool: Pool): Promise<Stake[]> {
-    const stakes = await this.stakeModel.find({
-      wallet,
-      pool,
-      stakedUntil: { $gt: new Date() }
-    })
-    return stakes;
-  }
-
-  async collect(ids: string[]) {
+  async collect(ids: string[], collectedDate: Date) {
     await this.stakeModel.updateMany({
       _id: { $in: ids }
     },{
-      collected: true
+      collected: true,
+      collectedDate
     });
   }
 
@@ -73,6 +64,19 @@ export class StakeService {
       collected: false,
     }).populate('pool')
     return stakes
+  }
+
+  async activeStakesRewards(token: string): Promise<number> {
+    const stakes = await this.stakeModel.find({
+      collected: false,
+      token
+    })
+    
+    let total: number = 0
+    for (const stake of stakes) {
+      total += stake.farmed
+    }
+    return total
   }
 
   async activeStakesPools(wallet: string): Promise<ActiveStakesPool[]>{
@@ -277,6 +281,32 @@ export class StakeService {
     return []
   }
 
+  async totalCurrentlyFarmed(): Promise<number> {
+    const total = await this.stakeModel.aggregate([
+      {
+        $match: {
+          collected: false
+        }
+      },
+      {
+        $group: {
+          _id: '$token',
+          totalAmount: {
+            $sum: '$farmed'
+          }
+        }
+      },{
+        $project: {
+          _id: 0,
+          token: '$_id',
+          totalAmount: '$totalAmount',
+        }
+      }
+    ])
+    console.log(await this.totalCurrentlyFarmed)
+    return 0
+  }
+
   async totalStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
     const total: {token:string, totalAmount:number, totalUsd:number}[] = await this.stakeModel.aggregate([
       {
@@ -312,4 +342,17 @@ export class StakeService {
     }
     return []
   }
+
+  async overview() {
+    const totalCurrentlyStaked = await this.totalCurrentlyStaked()
+    const apy = APY;
+
+    const token0 = await this.activeStakesRewards('0')
+    const token1 = await this.activeStakesRewards('1')
+    console.log(token0, token1)
+
+    const totalCurrentlyFarmed = await this.totalCurrentlyFarmed()
+    console.log(totalCurrentlyFarmed)
+  }
+
 }

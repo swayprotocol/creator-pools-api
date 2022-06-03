@@ -8,6 +8,7 @@ export class Stake {
   amount: number;
   wallet: string;
   collected: boolean;
+  collectedDate: Date;
   hash: string;
   farmed?: number;
 }
