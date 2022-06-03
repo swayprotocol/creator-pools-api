@@ -66,3 +66,14 @@ $ yarn test:e2e
 $ yarn test:cov
 ```
 
+## Enviroment variables
+
+MONGO_URL=`Connection link to our database`
+MORALIS_URL=`Connection link to Moralis database (You need to whitelist IP in Moralis)`
+WEB3_HTTP_PROVIDER =`Smartcontract provider link`
+STAKING_CONTRACT_ADDRESS=`Default staking contract address it can be set in config file`
+SWAY_TOKEN_ADDRESS=`Default token contract address it can be set in config file`
+PORT=`Port number`
+CONFIG=`Name of default config to use`
+APY=`ex. 111`
+
