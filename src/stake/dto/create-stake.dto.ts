@@ -16,4 +16,7 @@ export class CreateStakeDto {
 
   @IsString()
   hash: string;
+
+  @IsString()
+  token: string;
 }

@@ -16,5 +16,6 @@ export const stakeSchema = new mongoose.Schema<Stake>({
   planId: Number,
   poolHandle: String,
   sender: String,
+  token: String,
   transaction_index: Number,
 });

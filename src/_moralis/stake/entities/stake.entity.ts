@@ -14,5 +14,6 @@ export interface Stake {
   planId: number,
   poolHandle: string,
   sender: string,
+  token: string,
   transaction_index: number,
 }

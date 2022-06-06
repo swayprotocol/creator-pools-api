@@ -66,7 +66,8 @@ export class AppService {
         amount: parseFloat(utils.formatEther(stake.amount)),
         stakedAt: stake.block_timestamp,
         wallet: stake.sender,
-        hash: stake.transaction_hash
+        hash: stake.transaction_hash,
+        token: stake.token
       })
     }
     console.log(`Stakes added: ${moralisStakes.length}`)
