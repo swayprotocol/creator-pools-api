@@ -3,8 +3,7 @@ import { StakeService } from './stake.service';
 import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { TopStakedPools } from './dto/topStakedPools.dto';
-import { ActiveStakesPool } from './entities/helper.interfaces';
+import { ActiveStakesPool, TopStakedPool } from './entities/helper.interfaces';
 
 @ApiTags('stake')
 @Controller('stake')
@@ -18,7 +17,7 @@ export class StakeController {
 
   @ApiOperation({ summary: 'Pools ordered by most tokens staked'})
   @Get('/topStakedPools')
-  topStakedPools(): Promise<TopStakedPools[]> {
+  topStakedPools(): Promise<TopStakedPool[]> {
     return this.stakeService.topCreatorPools();  
   }
 

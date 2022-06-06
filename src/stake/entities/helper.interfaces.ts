@@ -28,3 +28,14 @@ export interface TokenOverview {
   APY: number,
   totalFarmed: number,
 }
+
+export interface TopStakedPool {
+  pool: Pool,
+  tokens: Token[]
+}
+
+export interface Token {
+  name: string,
+  price: number,
+  totalAmount: number,
+}

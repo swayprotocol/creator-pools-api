@@ -3,10 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Stake } from './entities/stake.entity';
 import { CreateStakeDto } from './dto/create-stake.dto';
-import { TopStakedPools } from './dto/topStakedPools.dto';
 import { Pool } from '../pool/entities/pool.entity';
 import { PoolService } from '../pool/pool.service';
-import { ActiveStakesPool, TokenDetails, TokenOverview } from './entities/helper.interfaces';
+import { ActiveStakesPool, Token, TokenDetails, TokenOverview, TopStakedPool } from './entities/helper.interfaces';
 import { getTokenPrice } from '../helpers/getTokenPrice';
 import { getTokenConfig } from '../helpers/getTokenConfig';
 import { APY, CONFIG } from '../config';
@@ -14,7 +13,6 @@ import { APY, CONFIG } from '../config';
 export class StakeService {
   constructor(
     @InjectModel('Stake') private readonly stakeModel: Model<Stake>,
-    @InjectModel('AggregatedPool') private readonly aggregatedPool: Model<TopStakedPools>,
     private readonly poolService: PoolService,
   ){}
 
@@ -180,48 +178,59 @@ export class StakeService {
     }
   }
 
-  async topCreatorPools(): Promise<TopStakedPools[]> {
+  async topCreatorPools(): Promise<TopStakedPool[]> {
+    let pools = {}
+    let stakes: Stake[] = await this.stakeModel.find({collected: false}).populate('pool')
+    const config = await getTokenConfig(CONFIG)
+    const token0Price = await getTokenPrice(config[0].coingecko_coin_ticker)
+    const token1Price = await getTokenPrice(config[1].coingecko_coin_ticker)
 
-    const pools: TopStakedPools[] = await this.stakeModel.aggregate([
-      {
-        $match: {
-          collected: false
+    for (const stake of stakes) {
+      // If pool doesn't exist in dict
+      if(!pools[stake.pool.creator]){
+        const token: Token = {
+          name: stake.token,
+          price: stake.token === config[0].name_in_contract ? token0Price : token1Price,
+          totalAmount: stake.amount,
         }
-      },
-      {
-        $group: {
-          _id: { 
-            pool: '$pool',
-            token: '$token',
-          },
-          totalAmount: {
-            $sum: '$amount'
+        const pool: TopStakedPool = {
+          pool: stake.pool,
+          tokens: [token]
+        }
+        pools[stake._id] = pool
+      } else {
+        // Pool already created
+        // Token alredy in tokens array
+        let token = pools[stake.pool.creator].tokens.find(token => token.name === stake.token)
+        if(token){
+          token.totalAmount += stake.amount
+        } else {
+          // Token not yet in tokens array
+          const token: Token = {
+            name: stake.token,
+            price: stake.token === config[0].name_in_contract ? token0Price : token1Price,
+            totalAmount: stake.amount,
           }
-        }
-      }, {
-        $sort: {
-          totalAmount: -1
-        }
-      }, {
-        $project: {
-          _id: 0, 
-          pool: '$_id.pool',
-          token: '$_id.token', 
-          totalAmount: '$totalAmount',
+          pools[stake.pool.creator].tokens.push(token)
         }
       }
-    ])
-
-    const config = await getTokenConfig(CONFIG)
-    const token01Price = await getTokenPrice(config[0].coingecko_coin_ticker)
-    const token02Price = await getTokenPrice(config[1].coingecko_coin_ticker)
-
-    for (const pool of pools) {
-      pool.tokenPrice = pool.token === config[0].name_in_contract ? token01Price : token02Price  
-      pool.totalPrice = pool.tokenPrice * pool.totalAmount
     }
-    const populated: TopStakedPools[] = await this.aggregatedPool.populate(pools, { path: 'pool', model: 'Pool' });
-    return populated;
+    const poolsArray: TopStakedPool[] = Object.values(pools)
+    poolsArray.sort((a, b) => {
+      let totalUsdA = 0
+      let totalUsdB = 0
+
+      for (const token of a.tokens) {
+        totalUsdA = token.price * token.totalAmount
+      }
+
+      for (const token of b.tokens) {
+        totalUsdB = token.price * token.totalAmount
+      }
+
+      return totalUsdB - totalUsdA
+    })
+    return poolsArray
   }
 
   async latestStakes(latest: number): Promise<Stake[]> {
