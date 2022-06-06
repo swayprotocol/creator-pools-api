@@ -217,7 +217,7 @@ export class StakeService {
     const token02Price = await getTokenPrice(config[1].coingecko_coin_ticker)
 
     for (const pool of pools) {
-      pool.tokenPrice = pool.token === '0' ? token01Price : token02Price  
+      pool.tokenPrice = pool.token === config[0].name_in_contract ? token01Price : token02Price  
       pool.totalPrice = pool.tokenPrice * pool.totalAmount
     }
     const populated: TopStakedPools[] = await this.aggregatedPool.populate(pools, { path: 'pool', model: 'Pool' });
@@ -304,8 +304,8 @@ export class StakeService {
 
       // Calculate price by blockchain token index and coingecko token price
       for (const token of total) {
-        if(token.token === '0') token.totalUsd = token.totalAmount * token0Price
-        if(token.token === '1') token.totalUsd = token.totalAmount * token1Price
+        if(token.token === tokenConfig[0].name_in_contract) token.totalUsd = token.totalAmount * token0Price
+        if(token.token === tokenConfig[1].name_in_contract) token.totalUsd = token.totalAmount * token1Price
       }
       return total
     }
@@ -328,6 +328,21 @@ export class StakeService {
     }
 
     return tokenOverviews
+  }
+
+  async tokensPrice() {
+    const config = await getTokenConfig(CONFIG)
+    const token0Price = await getTokenPrice(config[0].coingecko_coin_ticker)
+    const token1Price = await getTokenPrice(config[1].coingecko_coin_ticker)
+    return [
+      {
+        token: config[0].name_in_contract,
+        price: token0Price
+      },{
+        token: config[1].name_in_contract,
+        price: token1Price
+      }
+    ]
   }
 
 }

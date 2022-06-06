@@ -97,6 +97,12 @@ export class StakeController {
     return this.stakeService.overview()
   }
 
+  @ApiOperation({ summary: 'Get current price in dollars of both tokens'})
+  @Get('/tokensPrice')
+  async getTokenPrice() {
+    return this.stakeService.tokensPrice()
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Stake> {
     return this.stakeService.findOne(id);
