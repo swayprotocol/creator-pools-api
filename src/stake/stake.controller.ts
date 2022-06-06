@@ -4,7 +4,7 @@ import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TopStakedPools } from './dto/topStakedPools.dto';
-import { ActiveStakesPool } from './entities/activeStakesPool';
+import { ActiveStakesPool } from './entities/helper.interfaces';
 
 @ApiTags('stake')
 @Controller('stake')
@@ -48,7 +48,7 @@ export class StakeController {
 
   @ApiOperation({ summary: 'Total tokens currently staked on this smartcontract'})
   @Get('/totalCurrentlyStaked')
-  getTotalCurrentlyStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
+  getTotalCurrentlyStaked(): Promise<{token:string, totalStaked:number}[] | []> {
     return this.stakeService.totalCurrentlyStaked();
   }
 
@@ -89,6 +89,12 @@ export class StakeController {
   async getActiveStakesWallet(@Query('wallet') wallet: string): Promise<ActiveStakesPool[]> {
     if (!wallet) throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND)
     return this.stakeService.activeStakesPools(wallet.toLowerCase())
+  }
+
+  @ApiOperation({ summary: 'Get overview of both tokens'})
+  @Get('/overview')
+  async getOverview() {
+    return this.stakeService.overview()
   }
 
   @Get(':id')

@@ -21,3 +21,10 @@ export interface TokenDetails {
   walletFarmed: number,
   walletStakesCount: number,
 }
+
+export interface TokenOverview {
+  token: string,
+  totalStaked: number,
+  APY: number,
+  totalFarmed: number,
+}

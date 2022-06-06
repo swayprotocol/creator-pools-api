@@ -6,7 +6,7 @@ import { CreateStakeDto } from './dto/create-stake.dto';
 import { TopStakedPools } from './dto/topStakedPools.dto';
 import { Pool } from '../pool/entities/pool.entity';
 import { PoolService } from '../pool/pool.service';
-import { ActiveStakesPool, TokenDetails } from './entities/activeStakesPool';
+import { ActiveStakesPool, TokenDetails, TokenOverview } from './entities/helper.interfaces';
 import { getTokenPrice } from '../helpers/getTokenPrice';
 import { getTokenConfig } from '../helpers/getTokenConfig';
 import { APY, CONFIG } from '../config';
@@ -240,7 +240,7 @@ export class StakeService {
       .populate('pool')
   }
 
-  async totalCurrentlyStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
+  async totalCurrentlyStaked(): Promise<{token:string, totalStaked:number}[] | []> {
     const total = await this.stakeModel.aggregate([
       {
         $match: {
@@ -258,53 +258,22 @@ export class StakeService {
         $project: {
           _id: 0,
           token: '$_id',
-          totalAmount: '$totalAmount',
+          totalStaked: '$totalAmount',
         }
       }
     ])
 
-    if (total.length > 0) {
-      // Get configure
-      const tokenConfig = await getTokenConfig(CONFIG)
-
-      // Get price by configure coingecko tick
-      const token0Price = await getTokenPrice(tokenConfig[0].coingecko_coin_ticker)
-      const token1Price = await getTokenPrice(tokenConfig[1].coingecko_coin_ticker)
-
-      // Calculate price by blockchain token index and coingecko token price
-      for (const token of total) {
-        if(token.token === '0') token.totalUsd = token.totalAmount * token0Price
-        if(token.token === '1') token.totalUsd = token.totalAmount * token1Price
-      }
-      return total
-    }
-    return []
+    return total
   }
 
-  async totalCurrentlyFarmed(): Promise<number> {
-    const total = await this.stakeModel.aggregate([
-      {
-        $match: {
-          collected: false
-        }
-      },
-      {
-        $group: {
-          _id: '$token',
-          totalAmount: {
-            $sum: '$farmed'
-          }
-        }
-      },{
-        $project: {
-          _id: 0,
-          token: '$_id',
-          totalAmount: '$totalAmount',
-        }
-      }
-    ])
-    console.log(await this.totalCurrentlyFarmed)
-    return 0
+  async totalCurrentlyFarmed() {
+    const stakes = await this.stakeModel.find({collected: false})
+    const totalFarmedByToken = {}
+    for (const stake of stakes) {
+      if (!totalFarmedByToken[stake.token]) totalFarmedByToken[stake.token] = stake.farmed
+      totalFarmedByToken[stake.token] += stake.farmed
+    }
+    return totalFarmedByToken
   }
 
   async totalStaked(): Promise<{token:string, totalAmount:number, totalUsd:number}[] | []> {
@@ -343,16 +312,22 @@ export class StakeService {
     return []
   }
 
-  async overview() {
-    const totalCurrentlyStaked = await this.totalCurrentlyStaked()
-    const apy = APY;
-
-    const token0 = await this.activeStakesRewards('0')
-    const token1 = await this.activeStakesRewards('1')
-    console.log(token0, token1)
-
+  async overview(): Promise<TokenOverview[]> {
     const totalCurrentlyFarmed = await this.totalCurrentlyFarmed()
-    console.log(totalCurrentlyFarmed)
+    const totalCurrentlyStaked = await this.totalCurrentlyStaked()
+    const tokenOverviews: TokenOverview[] = []
+
+    for (let token of totalCurrentlyStaked) {
+      const tokenOverview: TokenOverview = {
+        token: token.token,
+        totalStaked: token.totalStaked,
+        APY: parseInt(APY),
+        totalFarmed: await this.activeStakesRewards(token.token) + totalCurrentlyFarmed[token.token]
+      }
+      tokenOverviews.push(tokenOverview)
+    }
+
+    return tokenOverviews
   }
 
 }
