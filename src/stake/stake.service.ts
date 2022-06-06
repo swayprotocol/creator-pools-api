@@ -197,7 +197,7 @@ export class StakeService {
           pool: stake.pool,
           tokens: [token]
         }
-        pools[stake._id] = pool
+        pools[stake.pool.creator] = pool
       } else {
         // Pool already created
         // Token alredy in tokens array
