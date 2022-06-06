@@ -38,5 +38,5 @@ export const stakeSchema = new mongoose.Schema<Stake>({
 
 stakeSchema.virtual('farmed').get(function() {
   const days = Math.abs(moment(this.collected ? this.collectedDate : this.stakedAt).diff(moment(),'days'))
-  return (this.amount ? this.amount : 0  * (parseFloat(APY)/100) * (days/365))
+  return (this.amount * (parseFloat(APY)/100) * (days/365))
 })
