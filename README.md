@@ -75,5 +75,5 @@ STAKING_CONTRACT_ADDRESS=`Default staking contract address it can be set in conf
 SWAY_TOKEN_ADDRESS=`Default token contract address it can be set in config file`
 PORT=`Port number`
 CONFIG=`Name of default config to use`
-APY=`ex. 111`
+
 
