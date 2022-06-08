@@ -143,20 +143,18 @@ export class StakeService {
         token0.totalAmount += stake.amount
         token0.averageAPY += APY
         token0.totalFarmed += stake.farmed
+        if(stake.wallet === wallet) {
+          token0.walletTotalAmount += stake.amount
+          token0.walletAverageAPY = APY
+          token0.walletFarmed += stake.farmed
+          token0.walletStakesCount += 1
+        }
       } else {
         token1.stakesCount += 1
         token1.totalAmount += stake.amount
         token1.averageAPY += APY
         token1.totalFarmed += stake.farmed
-      }
-
-      if(stake.wallet === wallet) {
-        if (stake.token === '0') {
-          token0.walletTotalAmount += stake.amount
-          token0.walletAverageAPY = APY
-          token0.walletFarmed += stake.farmed
-          token0.walletStakesCount += 1
-        } else {
+        if (stake.wallet === wallet) {
           token1.walletTotalAmount += stake.amount
           token1.walletAverageAPY = APY
           token1.walletFarmed += stake.farmed
@@ -169,14 +167,16 @@ export class StakeService {
     token0.walletAverageAPY = token0.walletAverageAPY / token0.walletStakesCount
     token1.walletAverageAPY = token1.walletAverageAPY / token1.walletStakesCount
 
+    const filteredStakes = (!wallet ? stakes : stakes.filter(stake=> stake.wallet === wallet))
+
     return {
       token0,
       token1,
       poolHandle: pool.creator,
       members,
-      numberOfStakes: stakes.length,
+      numberOfStakes: filteredStakes.length,
       pool,
-      stakes,
+      stakes: filteredStakes,
     }
   }
 
