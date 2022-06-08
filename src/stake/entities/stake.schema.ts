@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { getStakingAPY } from '../../helpers/getStakingAPY';
 import { CONFIG } from '../../config';
 import { Stake } from './stake.entity';
+const APY: number = getStakingAPY(CONFIG)
 
 export const stakeSchema = new mongoose.Schema<Stake>({
   pool: {
@@ -37,8 +38,7 @@ export const stakeSchema = new mongoose.Schema<Stake>({
   toObject: { virtuals: true }
 })
 
-stakeSchema.virtual('farmed').get(async function() {
-  const APY: number = await getStakingAPY(CONFIG)
+stakeSchema.virtual('farmed').get(function() {
   const days = Math.abs(moment(this.collected ? this.collectedDate : this.stakedAt).diff(moment(),'days'))
   return (this.amount * (APY/100) * (days/365))
 })
