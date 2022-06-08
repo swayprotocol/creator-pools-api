@@ -239,11 +239,18 @@ export class StakeService {
   }
 
   async highestPositions(latest: number): Promise<Stake[]> {
-    return await this.stakeModel
-      .find({ collected: false })
-      .sort({amount: -1})
-      .limit(latest)
-      .populate('pool')
+    const config = await getTokenConfig(CONFIG)
+    const token0Price = await getTokenPrice(config[0].coingecko_coin_ticker)
+    const token1Price = await getTokenPrice(config[1].coingecko_coin_ticker)
+    const stakes = await this.stakeModel.find({ collected: false }).populate('pool')
+    stakes.sort((a, b) => {
+      let totalUsdA = a.amount * (a.token === config[0].name_in_contract ? token0Price : token1Price)
+      let totalUsdB = b.amount * (b.token === config[0].name_in_contract ? token0Price : token1Price)
+      return totalUsdB - totalUsdA
+    })
+    // If latest is smaller than length we return full array else we split it
+    latest = stakes.length > latest ? latest : stakes.length
+    return stakes.splice(0,latest)
   }
 
   async totalCurrentlyStaked(): Promise<{token:string, totalStaked:number}[] | []> {

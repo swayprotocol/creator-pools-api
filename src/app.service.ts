@@ -37,8 +37,7 @@ export class AppService {
     await this.syncPools(fromDate)
     await this.syncStakes(fromDate)
     await this.syncClaims(fromDate)
-    await this.syncUnstake(fromDate
-      )
+    await this.syncUnstake(fromDate)
     console.log(`Sync finished ${new Date()}`)
   }
 
