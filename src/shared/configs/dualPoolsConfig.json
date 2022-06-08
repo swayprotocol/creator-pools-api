@@ -89,6 +89,7 @@
     "hasAltTheme": true
   },
   "token1": {
+    "name_in_contract": "0",
     "address": "0x665C1F40e522f89cAE4177d7CB6FD110A4cD7c37",
     "ticker": "XSWAY",
     "logo": "/assets/favicon-137x137.png",
@@ -97,6 +98,7 @@
     "circulating_supply": 10917462
   },
   "token2": {
+    "name_in_contract": "1",
     "address": "0xe1A3F0Ca19e64f6Bc516a036FF141e65eD219291",
     "ticker": "YTRAXX",
     "logo": "/assets/tt_logo.png",
