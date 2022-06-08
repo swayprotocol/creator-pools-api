@@ -188,30 +188,27 @@ export class StakeService {
     for (const stake of stakes) {
       // If pool doesn't exist in dict
       if(!pools[stake.pool.creator]){
-        const token: Token = {
+        const token0: Token = {
           name: stake.token,
           price: stake.token === config[0].name_in_contract ? token0Price : token1Price,
           totalAmount: stake.amount,
         }
+        const token1: Token = {
+          name: stake.token === config[0].name_in_contract ? config[1].name_in_contract : config[0].name_in_contract,
+          price: stake.token === config[0].name_in_contract ? token1Price : token0Price,
+          totalAmount: 0,
+        }
         const pool: TopStakedPool = {
           pool: stake.pool,
-          tokens: [token]
+          tokens: [token0,token1]
         }
         pools[stake.pool.creator] = pool
       } else {
         // Pool already created
         // Token alredy in tokens array
         let token = pools[stake.pool.creator].tokens.find(token => token.name === stake.token)
-        if(token){
+        if (token) {
           token.totalAmount += stake.amount
-        } else {
-          // Token not yet in tokens array
-          const token: Token = {
-            name: stake.token,
-            price: stake.token === config[0].name_in_contract ? token0Price : token1Price,
-            totalAmount: stake.amount,
-          }
-          pools[stake.pool.creator].tokens.push(token)
         }
       }
     }
