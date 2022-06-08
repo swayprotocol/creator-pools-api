@@ -49,6 +49,11 @@ export class StakeService {
     return stake;
   }
 
+  async findByHash(hash: string): Promise<Stake> {
+    const stake = await this.stakeModel.findOne({ hash })
+    return stake
+  }
+
   async findUncollected(wallet: string, pool: Pool): Promise<Stake[]> {
     const stakes = await this.stakeModel.find({
       wallet: wallet.toLowerCase(),

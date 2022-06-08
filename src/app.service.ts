@@ -56,54 +56,66 @@ export class AppService {
 
     poolSub.on('update', async cursor => {
       const pool = cursor.attributes
-      await this.poolService.create({
-        creator: pool.poolHandle,
-        startTime: pool.block_timestamp,
-        hash: pool.transaction_hash
-      })
+      const exists = await this.poolService.findByHash(pool.transaction_hash)
+      if (!exists) {
+        await this.poolService.create({
+          creator: pool.poolHandle,
+          startTime: pool.block_timestamp,
+          hash: pool.transaction_hash
+        })
+      }
     })
 
     stakeSub.on('update', async cursor => {
       const stake = cursor.attributes
       const plan = await this.planService.findOneByBlockchainIndex(stake.planId)
       const pool = await this.poolService.findOneByHandle(stake.poolHandle)
-      await this.stakeService.create({
-        plan: plan._id,
-        pool: pool._id,
-        amount: parseFloat(utils.formatEther(stake.amount)),
-        stakedAt: stake.block_timestamp,
-        wallet: stake.sender,
-        hash: stake.transaction_hash
-      })
+      const exists = await this.stakeService.findByHash(stake.transaction_hash)
+      if (!exists) {
+        await this.stakeService.create({
+          plan: plan._id,
+          pool: pool._id,
+          amount: parseFloat(utils.formatEther(stake.amount)),
+          stakedAt: stake.block_timestamp,
+          wallet: stake.sender,
+          hash: stake.transaction_hash
+        })
+      }
     })
     
     claimSub.on('update', async cursor => {
       const claim = cursor.attributes
       const pool = await this.poolService.findOneByHandle(claim.poolHandle)
-      await this.claimService.create({
-        wallet: claim.recipient,
-        pool: pool,
-        amount: parseFloat(utils.formatEther(claim.amount)),
-        claimDate: claim.block_timestamp,
-        hash: claim.transaction_hash,
-        unstaked: false
-      })
+      const exists = await this.claimService.findByHash(claim.transaction_hash)
+      if (!exists) {
+        await this.claimService.create({
+          wallet: claim.recipient,
+          pool: pool,
+          amount: parseFloat(utils.formatEther(claim.amount)),
+          claimDate: claim.block_timestamp,
+          hash: claim.transaction_hash,
+          unstaked: false
+        })
+      }
     })
 
     unstakeSub.on('update', async cursor => {
       const unstake = cursor.attributes
-      const pool = await this.poolService.findOneByHandle(unstake.poolHandle)
-      const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
-      const stakeIDs = stakes.map(stake => {return stake._id});
-      await this.stakeService.collect(stakeIDs);
-      await this.claimService.findAndCollect(unstake.recipient, pool._id);
-      await this.unstakeService.create({
-        wallet: unstake.recipient,
-        hash: unstake.transaction_hash,
-        pool: pool,
-        unstakeDate: unstake.block_timestamp,
-        amount: parseFloat(utils.formatEther(unstake.amount)),
-      })
+      const exists = await this.unstakeService.findByHash(unstake.transaction_hash)
+      if(!exists){
+        const pool = await this.poolService.findOneByHandle(unstake.poolHandle)
+        const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
+        const stakeIDs = stakes.map(stake => {return stake._id});
+        await this.stakeService.collect(stakeIDs);
+        await this.claimService.findAndCollect(unstake.recipient, pool._id);
+        await this.unstakeService.create({
+          wallet: unstake.recipient,
+          hash: unstake.transaction_hash,
+          pool: pool,
+          unstakeDate: unstake.block_timestamp,
+          amount: parseFloat(utils.formatEther(unstake.amount)),
+        })
+      }
     })
   }
 
