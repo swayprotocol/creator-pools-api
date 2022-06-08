@@ -200,7 +200,7 @@ export class StakeService {
         }
         const pool: TopStakedPool = {
           pool: stake.pool,
-          tokens: [token0,token1]
+          tokens: token0.name === config[0].name_in_contract ? [token0,token1] : [token1,token0]
         }
         pools[stake.pool.creator] = pool
       } else {
