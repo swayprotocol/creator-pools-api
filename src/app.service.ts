@@ -13,6 +13,10 @@ import './shared/abis/dualPools/staking-abi.json'
 import './shared/abis/production/staking-abi.json'
 import './shared/abis/staging/staking-abi.json'
 
+import './shared/abis/dualPools/token-abi.json'
+import './shared/abis/production/token-abi.json'
+import './shared/abis/staging/token-abi.json'
+
 import './shared/configs/dualPoolsConfig.json'
 import './shared/configs/productionConfig.json'
 import './shared/configs/stagingConfig.json'
