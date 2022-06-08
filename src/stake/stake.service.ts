@@ -8,7 +8,8 @@ import { PoolService } from '../pool/pool.service';
 import { ActiveStakesPool, Token, TokenDetails, TokenOverview, TopStakedPool } from './entities/helper.interfaces';
 import { getTokenPrice } from '../helpers/getTokenPrice';
 import { getTokenConfig } from '../helpers/getTokenConfig';
-import { APY, CONFIG } from '../config';
+import { CONFIG } from '../config';
+import { getStakingAPY } from 'src/helpers/getStakingAPY';
 @Injectable()
 export class StakeService {
   constructor(
@@ -104,6 +105,7 @@ export class StakeService {
 
   async activeStakesPool(poolName: string, wallet: string): Promise<ActiveStakesPool> {
     const pool = await this.poolService.findOneByHandle(poolName)
+    const APY: number = await getStakingAPY(CONFIG)
 
     let stakes: Stake[] = await this.stakeModel.find({
       pool,
@@ -139,24 +141,24 @@ export class StakeService {
       if (stake.token === '0') {
         token0.stakesCount += 1
         token0.totalAmount += stake.amount
-        token0.averageAPY += parseFloat(APY)
+        token0.averageAPY += APY
         token0.totalFarmed += stake.farmed
       } else {
         token1.stakesCount += 1
         token1.totalAmount += stake.amount
-        token1.averageAPY += parseFloat(APY)
+        token1.averageAPY += APY
         token1.totalFarmed += stake.farmed
       }
 
       if(stake.wallet === wallet) {
         if (stake.token === '0') {
           token0.walletTotalAmount += stake.amount
-          token0.walletAverageAPY = parseFloat(APY)
+          token0.walletAverageAPY = APY
           token0.walletFarmed += stake.farmed
           token0.walletStakesCount += 1
         } else {
           token1.walletTotalAmount += stake.amount
-          token1.walletAverageAPY = parseFloat(APY)
+          token1.walletAverageAPY = APY
           token1.walletFarmed += stake.farmed
           token1.walletStakesCount += 1
         }
@@ -329,12 +331,13 @@ export class StakeService {
     const totalCurrentlyFarmed = await this.totalCurrentlyFarmed()
     const totalCurrentlyStaked = await this.totalCurrentlyStaked()
     const tokenOverviews: TokenOverview[] = []
+    const APY:number = await getStakingAPY(CONFIG)
 
     for (let token of totalCurrentlyStaked) {
       const tokenOverview: TokenOverview = {
         token: token.token,
         totalStaked: token.totalStaked,
-        APY: parseInt(APY),
+        APY,
         totalFarmed: await this.activeStakesRewards(token.token) + totalCurrentlyFarmed[token.token]
       }
       tokenOverviews.push(tokenOverview)

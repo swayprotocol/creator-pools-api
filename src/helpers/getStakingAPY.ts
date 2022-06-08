@@ -2,7 +2,7 @@ import '../shared/configs/stagingConfig.json'
 import '../shared/configs/productionConfig.json'
 import '../shared/configs/dualPoolsConfig.json'
 
-export const getTokenConfig = async (name: string) => {
+export const getStakingAPY = async (name: string) => {
   const config = await require(`../shared/configs/${name}Config.json`)
-  return [config.token1,config.token2]
+  return config.staking.apy
 }
