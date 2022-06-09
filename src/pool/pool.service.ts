@@ -32,8 +32,13 @@ export class PoolService {
   }
 
   async findOneByHandle(handle: string): Promise<Pool> {
-    const plan = await this.poolModel.findOne({ creator: handle});
-    return plan;
+    const pool = await this.poolModel.findOne({ creator: handle});
+    return pool;
+  }
+
+  async findByHash(hash: string): Promise<Pool> {
+    const pool = await this.poolModel.findOne({ hash })
+    return pool
   }
 
   async updateByHandle(handle: string, updatePoolDto: CreatePoolDto): Promise<Pool> {
