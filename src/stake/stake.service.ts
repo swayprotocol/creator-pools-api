@@ -10,6 +10,7 @@ import { getTokenPrice } from '../helpers/getTokenPrice';
 import { getTokenConfig } from '../helpers/getTokenConfig';
 import { CONFIG } from '../config';
 import { getStakingAPY } from 'src/helpers/getStakingAPY';
+import { of } from 'rxjs';
 @Injectable()
 export class StakeService {
   constructor(
@@ -163,10 +164,15 @@ export class StakeService {
       }
     })
     token0.averageAPY = token0.averageAPY / token0.stakesCount
+    if (!token0.averageAPY) token0.averageAPY = 0
     token1.averageAPY = token1.averageAPY / token1.stakesCount
-    token0.walletAverageAPY = token0.walletAverageAPY / token0.walletStakesCount
-    token1.walletAverageAPY = token1.walletAverageAPY / token1.walletStakesCount
+    if (!token1.averageAPY) token1.averageAPY = 0
 
+    token0.walletAverageAPY = token0.walletAverageAPY / token0.walletStakesCount
+    if (!token0.walletAverageAPY) token0.walletAverageAPY = 0
+    token1.walletAverageAPY = token1.walletAverageAPY / token1.walletStakesCount
+    if (!token1.walletAverageAPY) token1.walletAverageAPY = 0
+   
     const filteredStakes = (!wallet ? stakes : stakes.filter(stake=> stake.wallet === wallet))
 
     return {
