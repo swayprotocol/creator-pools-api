@@ -21,7 +21,7 @@ async function bootstrap() {
     origin: [
       'https://creatorpools.live', 
       'https://staging.creatorpools.live',
-      'https://dualpools-api-staging-dot-swaysocial-one-pager.ew.r.appspot.com', // Change to DualPool
+      'https://dualpools-staging.web.app/', // Change to DualPool
       'http://localhost:3000'
     ]
   });
