@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { utils } from 'ethers';
+import Moralis from 'moralis/node';
 import { ClaimService } from './claim/claim.service';
 import { PoolService } from './pool/pool.service';
 import { StakeService } from './stake/stake.service';
@@ -8,6 +9,7 @@ import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { MoralisStakeService } from './_moralis/stake/stake.service';
 import { MoralisClaimService } from './_moralis/claim/claim.service';
 import { MoralisUnstakeService } from './_moralis/unstake/unstake.service';
+import { MORALIS_APP_ID, MORALIS_MATER_KEY, MORALIS_SERVER_URL } from './config';
 
 import './shared/abis/dualPools/staking-abi.json'
 import './shared/abis/production/staking-abi.json'
@@ -20,7 +22,6 @@ import './shared/abis/staging/token-abi.json'
 import './shared/configs/dualPoolsConfig.json'
 import './shared/configs/productionConfig.json'
 import './shared/configs/stagingConfig.json'
-
 @Injectable()
 export class AppService {
 
@@ -33,8 +34,80 @@ export class AppService {
     private readonly moralisStakeService: MoralisStakeService,
     private readonly moralisClaimService: MoralisClaimService,
     private readonly moralisUnstakeService: MoralisUnstakeService
-  ){}
+  ){
+    this.startMoralis()
+  }
 
+  async startMoralis() {
+    await Moralis.start({
+      serverUrl: MORALIS_SERVER_URL,
+      appId: MORALIS_APP_ID,
+      masterKey: MORALIS_MATER_KEY
+    })
+
+    const poolQuery = new Moralis.Query('Pools')
+    const poolSub = await poolQuery.subscribe()
+
+    const stakeQuery = new Moralis.Query('Stakes')
+    const stakeSub = await stakeQuery.subscribe() 
+
+    const claimQuery = new Moralis.Query('Claims')
+    const claimSub = await claimQuery.subscribe()
+
+    const unstakeQuery = new Moralis.Query('Unstakes')
+    const unstakeSub = await unstakeQuery.subscribe()
+
+    poolSub.on('update', async cursor => {
+      const pool = cursor.attributes
+      await this.poolService.create({
+        creator: pool.poolHandle,
+        startTime: pool.block_timestamp,
+        hash: pool.transaction_hash,
+      })
+    })
+
+    stakeSub.on('update', async cursor => {
+      const stake = cursor.attributes
+      const pool = await this.poolService.findOneByHandle(stake.poolHandle)
+      await this.stakeService.create({
+        pool: pool._id,
+        amount: parseFloat(utils.formatEther(stake.amount)),
+        stakedAt: stake.block_timestamp,
+        wallet: stake.sender,
+        hash: stake.transaction_hash,
+        token: stake.token
+      })
+    })
+
+    claimSub.on('update', async cursor => {
+      const claim = cursor.attributes
+      const pool = await this.poolService.findOneByHandle(claim.poolHandle)
+      await this.claimService.create({
+        wallet: claim.recipient,
+        pool: pool,
+        amount: parseFloat(utils.formatEther(claim.amount)),
+        claimDate: claim.block_timestamp,
+        hash: claim.transaction_hash,
+        unstaked: false
+      })
+    })
+
+    unstakeSub.on('update', async cursor => {
+      const unstake = cursor.attributes
+      const pool = await this.poolService.findOneByHandle(unstake.poolHandle)
+      const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
+      const stakeIDs = stakes.map(stake => {return stake._id});
+      await this.stakeService.collect(stakeIDs, unstake.block_timestamp);
+      await this.claimService.findAndCollect(unstake.recipient, pool._id);
+      await this.unstakeService.create({
+        wallet: unstake.recipient,
+        hash: unstake.transaction_hash,
+        pool: pool,
+        unstakeDate: unstake.block_timestamp,
+        amount: parseFloat(utils.formatEther(unstake.amount)),
+      })
+    })
+  }
 
   async syncDatabse(fromDate: Date) {
     console.log(`Sync started ${new Date()}`)
