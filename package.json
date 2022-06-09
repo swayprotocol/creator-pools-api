@@ -21,6 +21,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "predeploy": "nest build",
+    "deploy:dualStaging": "gcloud app deploy dualPools-staging.yaml --project swaysocial-one-pager",
     "deploy:prod": "gcloud app deploy app.yaml --project swaysocial-one-pager",
     "deploy:staging": "gcloud app deploy app-staging.yaml --project swaysocial-one-pager"
   },

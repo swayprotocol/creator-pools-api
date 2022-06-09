@@ -4,3 +4,6 @@ dispatch:
 
   - url: "api-staging.creatorpools.live/*"
     service: creatorpools-api-staging
+
+  - url: "dualpools-api-staging.creatorpools.live/*"
+    service: dualpools-api-staging
