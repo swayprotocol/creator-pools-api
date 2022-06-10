@@ -10,7 +10,7 @@ import { getTokenPrice } from '../helpers/getTokenPrice';
 import { getTokenConfig } from '../helpers/getTokenConfig';
 import { CONFIG } from '../config';
 import { getStakingAPY } from 'src/helpers/getStakingAPY';
-import { of } from 'rxjs';
+
 @Injectable()
 export class StakeService {
   constructor(
