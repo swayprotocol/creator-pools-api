@@ -6,4 +6,5 @@ export class Unstake {
   pool: Pool;
   unstakeDate: Date;
   amount: Number;
+  token: string;
 }

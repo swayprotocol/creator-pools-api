@@ -109,7 +109,7 @@ export class AppService {
         const pool = await this.poolService.findOneByHandle(unstake.poolHandle)
         const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
         const stakeIDs = stakes.map(stake => {return stake._id});
-        await this.stakeService.collect(stakeIDs, unstake.block_timestamp);
+        await this.stakeService.collect(stakeIDs, unstake.block_timestamp,unstake.token);
         await this.claimService.findAndCollect(unstake.recipient, pool._id);
         await this.unstakeService.create({
           wallet: unstake.recipient,
@@ -117,6 +117,7 @@ export class AppService {
           pool: pool,
           unstakeDate: unstake.block_timestamp,
           amount: parseFloat(utils.formatEther(unstake.amount)),
+          token: unstake.token
         })
       }
     })
@@ -206,7 +207,7 @@ export class AppService {
       
       const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
       const stakeIDs = stakes.map(stake => {return stake._id});
-      await this.stakeService.collect(stakeIDs, unstake.block_timestamp);
+      await this.stakeService.collect(stakeIDs, unstake.block_timestamp,unstake.token);
       await this.claimService.findAndCollect(unstake.recipient, pool._id);
       
       await this.unstakeService.create({
@@ -215,6 +216,7 @@ export class AppService {
         pool: pool,
         unstakeDate: unstake.block_timestamp,
         amount: parseFloat(utils.formatEther(unstake.amount)),
+        token: unstake.token
       })
     }
     console.log(`Unstakes added: ${moralisUnstakes.length}`)

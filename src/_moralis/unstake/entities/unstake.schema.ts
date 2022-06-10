@@ -15,5 +15,6 @@ export const unstakeSchema = new mongoose.Schema<Unstake>({
   confirmed: Boolean,
   poolHandle: String,
   recipient: String,
+  token: String,
   transaction_index: Number
 })

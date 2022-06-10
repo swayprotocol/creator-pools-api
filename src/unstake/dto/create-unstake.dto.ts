@@ -16,5 +16,8 @@ export class CreateUnstakeDto {
 
   @IsNumber()
   amount: Number;
+
+  @IsString()
+  token: string;
   
 }

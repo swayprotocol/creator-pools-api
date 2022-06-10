@@ -52,9 +52,10 @@ export class StakeService {
     return stakes;
   }
 
-  async collect(ids: string[], collectedDate: Date) {
+  async collect(ids: string[], collectedDate: Date, token: string) {
     await this.stakeModel.updateMany({
-      _id: { $in: ids }
+      _id: { $in: ids },
+      token
     },{
       collected: true,
       collectedDate

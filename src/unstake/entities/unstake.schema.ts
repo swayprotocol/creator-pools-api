@@ -17,5 +17,8 @@ export const unstakeSchema = new mongoose.Schema<Unstake>({
   },
   amount: {
     type: Number,
+  },
+  token: {
+    type: String,
   }
 })

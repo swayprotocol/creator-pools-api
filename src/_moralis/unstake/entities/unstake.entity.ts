@@ -13,5 +13,6 @@ export interface Unstake {
   confirmed: boolean,
   poolHandle: string,
   recipient: string,
+  token: string,
   transaction_index: number
 }
