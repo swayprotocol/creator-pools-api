@@ -49,4 +49,9 @@ export class PoolService {
     );
     return pool;
   }
+
+  async findByHash(hash: string): Promise<Pool> {
+    const pool = await this.poolModel.findOne({ hash })
+    return pool
+  }
 }
