@@ -18,11 +18,6 @@ import { Plan } from './entities/plan.entity';
 export class PlanController {
   constructor(private readonly planService: PlanService) {}
 
-  @Post()
-  create(@Body() createPlanDto: CreatePlanDto): Promise<Plan> {
-    return this.planService.create(createPlanDto);
-  }
-
   @Get()
   findAll(): Promise<Plan[]> {
     return this.planService.findAll();
