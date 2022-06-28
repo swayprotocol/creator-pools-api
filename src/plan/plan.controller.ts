@@ -42,11 +42,5 @@ export class PlanController {
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Plan> {
     return this.planService.findOne(id);
   }
-
-  @Delete(':id')
-  remove(@Param('id',  ValidateMongoId) id: string): Promise<Plan> {
-    return this.planService.remove(id);
-  }
-
 }
 
