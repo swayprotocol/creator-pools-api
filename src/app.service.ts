@@ -21,8 +21,6 @@ import './shared/abis/production/token-abi.json';
 import './shared/configs/stagingConfig.json';
 import './shared/abis/staging/staking-abi.json';
 import './shared/abis/staging/token-abi.json';
-import { MORALIS_APP_ID, MORALIS_MATER_KEY, MORALIS_SERVER_URL } from './config';
-
 @Injectable()
 export class AppService {
 
