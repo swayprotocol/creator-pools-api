@@ -1,9 +1,10 @@
-import { Controller, Get, Param, Query} from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Query} from '@nestjs/common';
 import { StakeService } from './stake.service';
 import { Stake } from './entities/stake.entity';
 import { ValidateMongoId } from '../validators/MongoId';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TopStakedPools } from './dto/topStakedPools.dto';
+import { ActiveStakesPool } from './entities/activeStakesPool';
 
 @ApiTags('stake')
 @Controller('stake')
@@ -17,7 +18,7 @@ export class StakeController {
 
   @Get('/topStakedPools')
   topStakedPools(): Promise<TopStakedPools[]> {
-    return this.stakeService.topCreatorPools();  
+    return this.stakeService.topCreatorPools();
   }
 
   @ApiQuery({
@@ -52,13 +53,49 @@ export class StakeController {
     return this.stakeService.totalStaked();
   }
 
+  @Get('/channelDistribution')
+  getchannelDistribution() {
+    return this.stakeService.channelDistribution();
+  }
+
+  @ApiQuery({
+    name: 'poolName',
+    type: String,
+    description: 'Pool name with its handle example: "ig-clout.art"',
+    required: true
+  })
+  @ApiQuery({
+    name: 'wallet',
+    type: String,
+    description: 'If you provide wallet it show only users stakes in pool',
+    required: false
+  })
+  @Get('/activeStakesPool')
+  async getActiveStakesPool(@Query('poolName') poolName: string, @Query('wallet') wallet?: string): Promise<ActiveStakesPool> {
+    const activeStakes = await this.stakeService.activeStakesPool(poolName, wallet);
+    if (!activeStakes.poolHandle) throw new HttpException('Pool not found', HttpStatus.NOT_FOUND)
+    return activeStakes
+  }
+
+  @ApiQuery({
+    name: 'wallet',
+    type: String,
+    description: 'All active stake by wallet',
+    required: true
+  })
+  @Get('/activeStakesWallet')
+  async getActiveStakesWallet(@Query('wallet') wallet: string): Promise<ActiveStakesPool[]> {
+    if (!wallet) throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND)
+    return this.stakeService.activeStakesPools(wallet)
+  }
+
   @Get(':id')
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Stake> {
     return this.stakeService.findOne(id);
   }
 
-  @Get('/activeStakes/:wallet')
-  getActiveStakes(@Param('wallet') wallet: string):Promise<Stake[]> {
+  @Get('/allActiveStakes/:wallet')
+  getActiveStakes(@Param('wallet') wallet: string): Promise<Stake[]> {
     return this.stakeService.activeStakes(wallet)
   }
 }

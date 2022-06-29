@@ -3,8 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateClaimDto } from './dto/create-claim.dto';
 import { Claim } from './entities/claim.entity';
-import { PoolService } from '../pool/pool.service';
-import { UnstakeService } from '../unstake/unstake.service';
 
 
 @Injectable()
@@ -35,9 +33,14 @@ export class ClaimService {
     return claim;
   }
 
+  async findByHash(hash: string): Promise<Claim> {
+    const claim = await this.claimModel.findOne({ hash });
+    return claim;
+  }
+
   async findAndCollect(wallet: string, poolId: string): Promise<Claim[]> {
     const claims = await this.claimModel.find({
-      wallet,
+      wallet: wallet.toLowerCase(),
       pool: poolId,
       unstaked: false,
     });
@@ -63,12 +66,12 @@ export class ClaimService {
         }
       }, {
         '$project': {
-          '_id': 0, 
+          '_id': 0,
           'totalAmount': '$totalAmount'
         }
       }
     ])
-    
+
     if (total.length > 0) return total[0].totalAmount
     return 0
   }

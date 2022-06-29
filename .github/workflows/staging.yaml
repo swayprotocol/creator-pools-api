@@ -7,41 +7,43 @@ on:
       - staging
 
 jobs:
-  build:
-    name: Build api - Staging
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
-        with:
-            node-version: '14'
-            cache: 'yarn'
-            cache-dependency-path: yarn.lock
-            
-      - run: yarn
-      
-      - name: Create env file for API
-        env:
-          ENV_FILE: ${{ secrets.ENV_API_STAGING }}
-        run: |
-          echo $ENV_FILE | base64 --decode > .env
-        
-      - run: yarn predeploy
-            
-  deploy_app_staging:
-      needs: [build]
-      name: Deploy api - Staging
+  deploy_api_staging:
+      name: Deploy API - Staging
       runs-on: ubuntu-latest
       permissions:
         contents: read
         id-token: write
       steps:
         - uses: actions/checkout@v2
+
+        - uses: actions/setup-node@v2
+          with:
+            node-version: '14'
+            cache: 'yarn'
+            cache-dependency-path: yarn.lock
+
+        - run: yarn
+
+        - name: Create env file for API
+          env:
+            ENV_FILE: ${{ secrets.ENV_API_STAGING }}
+          run: |
+            echo $ENV_FILE | base64 -di > .env
+
+        - run: yarn predeploy
         
         - uses: google-github-actions/setup-gcloud@v0
           with:
             project_id: ${{ secrets.GCP_PROJECT }}
+
+        - name: Auth with Google Cloud
+          id: auth
+          uses: google-github-actions/auth@v0.4.2
+          with:
+            workload_identity_provider: 'projects/969357121066/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+            service_account: 'github-actions@swaysocial-one-pager.iam.gserviceaccount.com'
+            project_id: ${{ secrets.GCP_PROJECT }}
+
         - name: Deploy to GAE
           run: |-
             gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
