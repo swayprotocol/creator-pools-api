@@ -45,7 +45,6 @@ jobs:
             project_id: ${{ secrets.GCP_PROJECT }}
 
         - name: Deploy to GAE
-          working-directory: api
           run: |-
             gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
             gcloud app deploy app-staging.yaml --version=staging --quiet
