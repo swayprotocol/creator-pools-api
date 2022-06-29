@@ -1,21 +1,11 @@
 cron:
 # staging
-- description: "Sync database short interval"
-  url: /databaseSyncMinutes?minutes=2
-  schedule: every 1 mins
-  target: creatorpools-api-staging
-
 - description: "Sync database long interval"
   url: /databaseSyncMinutes?minutes=500
   schedule: every 8 hours
   target: creatorpools-api-staging
 
   # Production
-- description: "Sync database"
-  url: /databaseSyncMinutes?minutes=2
-  schedule: every 1 mins
-  target: default
-
 - description: "Sync database long interval"
   url: /databaseSyncMinutes?minutes=500
   schedule: every 8 hours

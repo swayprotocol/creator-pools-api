@@ -75,5 +75,14 @@ export class PlanService {
     return plans[0]
   }
 
+  async getAverageApy(): Promise<number> {
+    const plans = await this.getActive()
+    let sum = 0
+    for (const plan of plans) {
+      sum += plan.apy
+    }
+    return sum/plans.length
+  }
+
 }
 

@@ -18,11 +18,6 @@ import { Plan } from './entities/plan.entity';
 export class PlanController {
   constructor(private readonly planService: PlanService) {}
 
-  @Post()
-  create(@Body() createPlanDto: CreatePlanDto): Promise<Plan> {
-    return this.planService.create(createPlanDto);
-  }
-
   @Get()
   findAll(): Promise<Plan[]> {
     return this.planService.findAll();
@@ -47,11 +42,5 @@ export class PlanController {
   findOne(@Param('id', ValidateMongoId) id: string): Promise<Plan> {
     return this.planService.findOne(id);
   }
-
-  @Delete(':id')
-  remove(@Param('id',  ValidateMongoId) id: string): Promise<Plan> {
-    return this.planService.remove(id);
-  }
-
 }
 
