@@ -28,7 +28,7 @@ jobs:
           env:
             ENV_FILE: ${{ secrets.ENV_API_STAGING }}
           run: |
-            echo $ENV_FILE | base64 --decode > .env
+            echo $ENV_FILE | base64 -di > .env
 
         - run: yarn predeploy
         
