@@ -31,6 +31,11 @@ export class PoolService {
     return pool;
   }
 
+  async findByHash(hash: string): Promise<Pool> {
+    const pool = await this.poolModel.findOne({ hash })
+    return pool;
+  }
+
   async findOneByHandle(handle: string): Promise<Pool> {
     const plan = await this.poolModel.findOne({ creator: handle});
     return plan;
@@ -43,10 +48,5 @@ export class PoolService {
       { new: true }
     );
     return pool;
-  }
-
-  async findByHash(hash: string): Promise<Pool> {
-    const pool = await this.poolModel.findOne({ hash })
-    return pool
   }
 }

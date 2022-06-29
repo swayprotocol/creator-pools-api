@@ -50,8 +50,8 @@ export class StakeService {
   }
 
   async findByHash(hash: string): Promise<Stake> {
-    const stake = await this.stakeModel.findOne({ hash })
-    return stake
+    const stake = await this.stakeModel.findOne({ hash });
+    return stake;
   }
 
   async findUncollected(wallet: string, pool: Pool): Promise<Stake[]> {
@@ -142,6 +142,7 @@ export class StakeService {
 
   async activeStakesPool(poolName: string, wallet: string): Promise<ActiveStakesPool> {
     const pool = await this.poolService.findOneByHandle(poolName)
+    const averageApy = await this.planService.getAverageApy()
     if (wallet) wallet = wallet.toLowerCase();
 
     let stakes: Stake[] = await this.stakeModel.find(
@@ -166,14 +167,19 @@ export class StakeService {
 
     stakes.map(stake => {
       if(!members.includes(stake.wallet)) members.push(stake.wallet)
+      let farmed = stake.farmed
+      if (!farmed) {
+        const days = Math.abs(moment(stake.stakedAt).diff(moment(),'days'))
+        farmed = (stake.amount * (averageApy/100) * (days/365))
+      }
       totalAmount += stake.amount
-      averageAPY += stake.plan?.apy
-      totalFarmed += stake.farmed
+      averageAPY += stake.plan?.apy ? stake.plan?.apy : averageApy
+      totalFarmed += farmed
 
       if(stake.wallet === wallet) {
         walletTotalAmount += stake.amount
-        walletAverageAPY = stake.plan?.apy
-        walletFarmed += stake.farmed
+        walletAverageAPY = stake.plan?.apy ? stake.plan?.apy : averageApy
+        walletFarmed += farmed
         walletStakesCount += 1
       }
     })

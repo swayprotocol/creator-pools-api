@@ -34,8 +34,8 @@ export class ClaimService {
   }
 
   async findByHash(hash: string): Promise<Claim> {
-    const claim = await this.claimModel.findOne({ hash })
-    return claim
+    const claim = await this.claimModel.findOne({ hash });
+    return claim;
   }
 
   async findAndCollect(wallet: string, poolId: string): Promise<Claim[]> {
