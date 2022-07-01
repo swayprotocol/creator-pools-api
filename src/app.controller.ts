@@ -7,13 +7,13 @@ import { AppService } from './app.service';
 @Controller('')
 export class AppController {
   constructor(private readonly appService: AppService) {}
-  
+
   @ApiQuery({
     name: "fromDate",
     type: Date,
     description: "Sync database from this date till now",
     required: true,
-  })  
+  })
   @ApiOperation({ summary: 'Sync database events from moralis, from parameter date till now'})
   @Get('/databaseSync')
   async databaseSync(@Query('fromDate') fromDate: Date) {
@@ -60,7 +60,7 @@ export class AppController {
   }
 
   @ApiOperation({ summary: 'Check if server is up'})
-  @Get('/healt')
+  @Get('/health')
   getHealth(): Date {
     return this.appService.getHealth();
   }
