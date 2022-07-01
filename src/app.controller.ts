@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 @Controller('')
 export class AppController {
   constructor(private readonly appService: AppService) {}
-  
+
   @ApiQuery({
     name: "fromDate",
     type: Date,
@@ -54,8 +54,8 @@ export class AppController {
     return abi
   }
 
-  @Get('/healt')
-  getHealth(): Date {
+  @Get('/health')
+  getHealth(): any {
     return this.appService.getHealth();
   }
 }

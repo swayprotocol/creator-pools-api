@@ -10,9 +10,9 @@ import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { MoralisStakeService } from './_moralis/stake/stake.service';
 import { MoralisClaimService } from './_moralis/claim/claim.service';
 import { MoralisUnstakeService } from './_moralis/unstake/unstake.service';
-import { 
-  MORALIS_APP_ID, 
-  MORALIS_MASTER_KEY, 
+import {
+  MORALIS_APP_ID,
+  MORALIS_MASTER_KEY,
   MORALIS_SERVER_URL } from './config';
 
 import './shared/configs/productionConfig.json';
@@ -49,7 +49,7 @@ export class AppService {
     const poolSub = await poolQuery.subscribe()
 
     const stakeQuery = new Moralis.Query('Stakes')
-    const stakeSub = await stakeQuery.subscribe() 
+    const stakeSub = await stakeQuery.subscribe()
 
     const claimQuery = new Moralis.Query('Claims')
     const claimSub = await claimQuery.subscribe()
@@ -221,12 +221,12 @@ export class AppService {
 
     for await (const unstake of moralisUnstakes) {
       const pool = pools[unstake.poolHandle]
-      
+
       const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
       const stakeIDs = stakes.map(stake => {return stake._id});
       await this.stakeService.collect(stakeIDs);
       await this.claimService.findAndCollect(unstake.recipient, pool._id);
-      
+
       await this.unstakeService.create({
         wallet: unstake.recipient,
         hash: unstake.transaction_hash,
@@ -264,8 +264,11 @@ export class AppService {
       return null
     }
   }
-
-  getHealth(): Date {
-    return new Date();
+  getHealth(): any {
+    return {
+      uptime: process.uptime(),
+      message: 'Ok',
+      date: new Date(),
+    };
   }
 }
