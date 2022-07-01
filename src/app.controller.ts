@@ -61,7 +61,7 @@ export class AppController {
 
   @ApiOperation({ summary: 'Check if server is up'})
   @Get('/health')
-  getHealth(): Date {
+  getHealth(): any {
     return this.appService.getHealth();
   }
 }
