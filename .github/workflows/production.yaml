@@ -7,12 +7,16 @@ on:
       - main
 
 jobs:
-  build:
+  deploy_api:
     name: Build api - Production
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-node@v2
         with:
             node-version: '14'
