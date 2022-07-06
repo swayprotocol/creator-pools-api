@@ -118,18 +118,21 @@ export class AppService {
       const exists = await this.unstakeService.findByHash(unstake.transaction_hash)
       if (!exists) {
         try {
-          const pool = await this.poolService.findOneByHandle(unstake.poolHandle)
-          const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
-          const stakeIDs = stakes.map(stake => {return stake._id});
-          await this.stakeService.collect(stakeIDs);
-          await this.claimService.findAndCollect(unstake.recipient, pool._id);
-          await this.unstakeService.create({
-            wallet: unstake.recipient,
-            hash: unstake.transaction_hash,
-            pool: pool,
-            unstakeDate: unstake.block_timestamp,
-            amount: parseFloat(utils.formatEther(unstake.amount)),
-          })
+          const amount = parseFloat(utils.formatEther(unstake.amount))
+          if (amount !== 0) {
+            const pool = await this.poolService.findOneByHandle(unstake.poolHandle)
+            const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
+            const stakeIDs = stakes.map(stake => {return stake._id});
+            await this.stakeService.collect(stakeIDs);
+            await this.claimService.findAndCollect(unstake.recipient, pool._id);
+            await this.unstakeService.create({
+              wallet: unstake.recipient,
+              hash: unstake.transaction_hash,
+              pool: pool,
+              unstakeDate: unstake.block_timestamp,
+              amount: amount,
+            })
+          }
         } catch {
           console.log('Error inserting new unstake')
         }
@@ -220,20 +223,21 @@ export class AppService {
     const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
     for await (const unstake of moralisUnstakes) {
-      const pool = pools[unstake.poolHandle]
-
-      const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
-      const stakeIDs = stakes.map(stake => {return stake._id});
-      await this.stakeService.collect(stakeIDs);
-      await this.claimService.findAndCollect(unstake.recipient, pool._id);
-
-      await this.unstakeService.create({
-        wallet: unstake.recipient,
-        hash: unstake.transaction_hash,
-        pool: pool,
-        unstakeDate: unstake.block_timestamp,
-        amount: parseFloat(utils.formatEther(unstake.amount)),
-      })
+      const amount = parseFloat(utils.formatEther(unstake.amount))
+      if(amount !== 0) {
+        const pool = pools[unstake.poolHandle]
+        const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
+        const stakeIDs = stakes.map(stake => {return stake._id});
+        await this.stakeService.collect(stakeIDs);
+        await this.claimService.findAndCollect(unstake.recipient, pool._id);
+        await this.unstakeService.create({
+          wallet: unstake.recipient,
+          hash: unstake.transaction_hash,
+          pool: pool,
+          unstakeDate: unstake.block_timestamp,
+          amount: amount,
+        })
+      }
     }
     console.log(`Unstakes added: ${moralisUnstakes.length}`)
   }
