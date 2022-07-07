@@ -12,6 +12,7 @@ import { MoralisPoolModule } from './_moralis/pool/pool.module';
 import { MoralisStakeModule } from './_moralis/stake/stake.module';
 import { MoralisClaimModule } from './_moralis/claim/claim.module';
 import { MoralisUnstakeModule } from './_moralis/unstake/unstake.module';
+import { StakingContract } from './shared/StakingContract';
 
 const ourDB = MongooseModule.forRoot(MONGO_URL, {connectionName: 'ourDb'});
 const moralisDB = MongooseModule.forRoot(MORALIS_URL, {connectionName: 'moralisDb'});
@@ -31,6 +32,6 @@ const moralisDB = MongooseModule.forRoot(MORALIS_URL, {connectionName: 'moralisD
     MoralisUnstakeModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, StakingContract],
 })
 export class AppModule {}

@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { utils } from 'ethers';
+import moment from 'moment';
 import Moralis from 'moralis/node';
+import { Injectable } from '@nestjs/common';
+import { Contract, utils } from 'ethers';
+import { StakingContract } from './shared/StakingContract';
 import { ClaimService } from './claim/claim.service';
 import { PlanService } from './plan/plan.service';
 import { PoolService } from './pool/pool.service';
@@ -10,9 +12,10 @@ import { MoralisPoolService } from './_moralis/pool/pool.service';
 import { MoralisStakeService } from './_moralis/stake/stake.service';
 import { MoralisClaimService } from './_moralis/claim/claim.service';
 import { MoralisUnstakeService } from './_moralis/unstake/unstake.service';
-import {
-  MORALIS_APP_ID,
-  MORALIS_MASTER_KEY,
+import { 
+  CONFIG,
+  MORALIS_APP_ID, 
+  MORALIS_MASTER_KEY, 
   MORALIS_SERVER_URL } from './config';
 
 import './shared/configs/productionConfig.json';
@@ -25,6 +28,7 @@ import './shared/abis/staging/token-abi.json';
 export class AppService {
 
   constructor(
+    private readonly contract: StakingContract,
     private readonly planService: PlanService,
     private readonly poolService: PoolService,
     private readonly claimService: ClaimService,
@@ -83,6 +87,7 @@ export class AppService {
             pool: pool._id,
             amount: parseFloat(utils.formatEther(stake.amount)),
             stakedAt: stake.block_timestamp,
+            stakedUntil: stake.block_timestamp,
             wallet: stake.sender,
             hash: stake.transaction_hash,
             plan: undefined
@@ -166,6 +171,7 @@ export class AppService {
   }
 
   async syncStakes(fromDate: Date) {
+    const stakingContract: Contract = await this.contract.getStakingContract(CONFIG);
     const stakes = await this.stakeService.findAllAfter(fromDate)
     const stakesHashes = stakes.map(stake => { return stake.hash })
 
@@ -178,12 +184,35 @@ export class AppService {
 
     for await (const stake of moralisStakes) {
       const plan = plans[stake.planId]
+      const pool = pools[stake.poolHandle]
+      const poolStakes = await stakingContract.getPoolQueue(stake.poolHandle)
+      const userStakes = await stakingContract.getUserQueue(stake.sender)
+
+      const moralisStakedAt = moment(stake.block_timestamp).format('X')
+      let index = 0
+      poolStakes[2].find(date =>{
+        if (date.toString()===moralisStakedAt) {
+          const stakedAt = poolStakes[2][index]
+          const stakedUntil = poolStakes[2][index+1]
+          // console.log('Result',stakedAt)
+          return stakedUntil
+        }
+        index++;
+      })
+      const stakedUntil = userStakes.find(bcStake => {
+        const unlockTime = bcStake.unlockTime.toString()
+        if (bcStake.indexInPool.toString() === index.toString() && unlockTime !== '0') {
+          return bcStake
+        }
+      })
+      const stakedUntilDate = stakedUntil ? moment.unix(stakedUntil.unlockTime).toDate() : null
 
       await this.stakeService.create({
         plan: plan,
-        pool: pools[stake.poolHandle],
+        pool: pool,
         amount: parseFloat(utils.formatEther(stake.amount)),
         stakedAt: stake.block_timestamp,
+        stakedUntil: stakedUntilDate,
         wallet: stake.sender,
         hash: stake.transaction_hash
       })
@@ -201,9 +230,11 @@ export class AppService {
     const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
     for await (const claim of moralisClaims) {
+      const pool = pools[claim.poolHandle]
+      await this.stakeService.claimedStakedAt(claim.recipient,pool,claim.block_timestamp)
       await this.claimService.create({
         wallet: claim.recipient,
-        pool: pools[claim.poolHandle],
+        pool: pool,
         amount: parseFloat(utils.formatEther(claim.amount)),
         claimDate: claim.block_timestamp,
         hash: claim.transaction_hash,
@@ -224,7 +255,7 @@ export class AppService {
 
     for await (const unstake of moralisUnstakes) {
       const amount = parseFloat(utils.formatEther(unstake.amount))
-      if(amount !== 0) {
+      if (amount !== 0) {
         const pool = pools[unstake.poolHandle]
         const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
         const stakeIDs = stakes.map(stake => {return stake._id});
