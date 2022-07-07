@@ -44,7 +44,7 @@ export class AppService {
 
   async startMoralis() {
     const stakingContract: Contract = await this.contract.getStakingContract(CONFIG);
-    
+
     await Moralis.start({
       serverUrl: MORALIS_SERVER_URL,
       appId: MORALIS_APP_ID,
@@ -124,6 +124,7 @@ export class AppService {
       if (!exists) {
         try {
           const pool = await this.poolService.findOneByHandle(claim.poolHandle)
+          await this.stakeService.claimedStakedAt(claim.recipient,pool,claim.block_timestamp)
           await this.claimService.create({
             wallet: claim.recipient,
             pool: pool,
