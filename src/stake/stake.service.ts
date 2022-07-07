@@ -21,16 +21,7 @@ export class StakeService {
   ){}
 
   async create(createStakeDto: CreateStakeDto): Promise<Stake> {
-    const plan = await this.planService.findOne(createStakeDto.plan);
-    const stake = new this.stakeModel({
-      plan: createStakeDto.plan,
-      pool: createStakeDto.pool,
-      stakedAt: createStakeDto.stakedAt,
-      stakedUntil: plan ? moment(createStakeDto.stakedAt).add(plan.lockMonths,'M').toDate() : null,
-      amount: createStakeDto.amount,
-      wallet: createStakeDto.wallet,
-      hash: createStakeDto.hash,
-    });
+    const stake = new this.stakeModel(createStakeDto);
     return await stake.save();
   }
 
@@ -70,6 +61,17 @@ export class StakeService {
       stakedUntil: { $gt: new Date() }
     })
     return stakes;
+  }
+
+  async claimedStakedAt(wallet:string, pool: Pool, stakedAt: Date) {
+    const stakes = await this.stakeModel.updateMany({
+      wallet: wallet.toLowerCase(),
+      pool,
+      collected: false,
+    }, {
+      stakedAt: stakedAt
+    })
+    return stakes
   }
 
   async collect(ids: string[]) {
