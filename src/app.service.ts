@@ -43,6 +43,8 @@ export class AppService {
   }
 
   async startMoralis() {
+    const stakingContract: Contract = await this.contract.getStakingContract(CONFIG);
+    
     await Moralis.start({
       serverUrl: MORALIS_SERVER_URL,
       appId: MORALIS_APP_ID,
@@ -72,7 +74,7 @@ export class AppService {
             hash: pool.transaction_hash,
           })
         } catch {
-          console.log('Error inserting new pool')
+          console.error('Error inserting new pool')
         }
       }
     })
@@ -82,18 +84,36 @@ export class AppService {
       const exists = await this.stakeService.findByHash(stake.transaction_hash)
       if (!exists) {
         try {
+
           const pool = await this.poolService.findOneByHandle(stake.poolHandle)
+          const poolStakes = await stakingContract.getPoolQueue(stake.poolHandle)
+          const userStakes = await stakingContract.getUserQueue(stake.sender)
+
+          const moralisStakedAt = moment(stake.block_timestamp).format('X')
+          let index = 0
+          poolStakes[2].find(date =>{
+            if (date.toString()===moralisStakedAt) {return date}
+            index++;
+          })
+          const bcStake = userStakes.find(bcStake => {
+            const unlockTime = bcStake.unlockTime.toString()
+            if (bcStake.indexInPool.toString() === index.toString() && unlockTime !== '0') {
+              return bcStake
+            }
+          })
+          const stakedUntilDate = bcStake ? moment.unix(bcStake.unlockTime).toDate() : null
+          const plan = await this.planService.findOneByBlockchainIndex(bcStake.planId)
           await this.stakeService.create({
+            plan: plan._id,
             pool: pool._id,
             amount: parseFloat(utils.formatEther(stake.amount)),
             stakedAt: stake.block_timestamp,
-            stakedUntil: stake.block_timestamp,
+            stakedUntil: stakedUntilDate,
             wallet: stake.sender,
             hash: stake.transaction_hash,
-            plan: undefined
           })
         } catch {
-          console.log('Error inserting new stake')
+          console.error('Error inserting new stake')
         }
       }
     })
@@ -113,7 +133,7 @@ export class AppService {
             unstaked: false
           })
         } catch {
-          console.log('Error inserting new claim')
+          console.error('Error inserting new claim')
         }
       }
     })
@@ -139,7 +159,7 @@ export class AppService {
             })
           }
         } catch {
-          console.log('Error inserting new unstake')
+          console.error('Error inserting new unstake')
         }
       }
     })
@@ -155,122 +175,133 @@ export class AppService {
   }
 
   async syncPools(fromDate: Date) {
-    const pools = await this.poolService.findAllAfter(fromDate)
-    const poolsHashes = pools.map(pool => { return pool.hash })
-
-    const moralisPools = await this.moralisPoolService.findMissing(poolsHashes, fromDate);
-
-    for await (const pool of moralisPools) {
-      await this.poolService.create({
-        creator: pool.poolHandle,
-        startTime: pool.block_timestamp,
-        hash: pool.transaction_hash
-      })
+    try {
+      const pools = await this.poolService.findAllAfter(fromDate)
+      const poolsHashes = pools.map(pool => { return pool.hash })
+  
+      const moralisPools = await this.moralisPoolService.findMissing(poolsHashes, fromDate);
+  
+      for await (const pool of moralisPools) {
+        await this.poolService.create({
+          creator: pool.poolHandle,
+          startTime: pool.block_timestamp,
+          hash: pool.transaction_hash
+        })
+      }
+      console.log(`Pools added: ${moralisPools.length}`)
+    } catch (error) {
+      console.error("Syncing pools failed")
     }
-    console.log(`Pools added: ${moralisPools.length}`)
+
   }
 
   async syncStakes(fromDate: Date) {
-    const stakingContract: Contract = await this.contract.getStakingContract(CONFIG);
-    const stakes = await this.stakeService.findAllAfter(fromDate)
-    const stakesHashes = stakes.map(stake => { return stake.hash })
+    try {
+      const stakingContract: Contract = await this.contract.getStakingContract(CONFIG);
+      const stakes = await this.stakeService.findAllAfter(fromDate)
+      const stakesHashes = stakes.map(stake => { return stake.hash })
 
-    const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes, fromDate);
+      const moralisStakes = await this.moralisStakeService.findMissing(stakesHashes, fromDate);
 
-    const plansArray = await this.planService.findAll();
-    const plans = Object.assign({}, ...plansArray.map((x) => ({[x.blockchainIndex]: x._id})));
-    const poolsArray = await this.poolService.findAll();
-    const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
+      const plansArray = await this.planService.findAll();
+      const plans = Object.assign({}, ...plansArray.map((x) => ({[x.blockchainIndex]: x._id})));
+      const poolsArray = await this.poolService.findAll();
+      const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
-    for await (const stake of moralisStakes) {
-      const plan = plans[stake.planId]
-      const pool = pools[stake.poolHandle]
-      const poolStakes = await stakingContract.getPoolQueue(stake.poolHandle)
-      const userStakes = await stakingContract.getUserQueue(stake.sender)
+      for await (const stake of moralisStakes) {
+        const pool = pools[stake.poolHandle]
+        const poolStakes = await stakingContract.getPoolQueue(stake.poolHandle)
+        const userStakes = await stakingContract.getUserQueue(stake.sender)
 
-      const moralisStakedAt = moment(stake.block_timestamp).format('X')
-      let index = 0
-      poolStakes[2].find(date =>{
-        if (date.toString()===moralisStakedAt) {
-          const stakedAt = poolStakes[2][index]
-          const stakedUntil = poolStakes[2][index+1]
-          // console.log('Result',stakedAt)
-          return stakedUntil
-        }
-        index++;
-      })
-      const stakedUntil = userStakes.find(bcStake => {
-        const unlockTime = bcStake.unlockTime.toString()
-        if (bcStake.indexInPool.toString() === index.toString() && unlockTime !== '0') {
-          return bcStake
-        }
-      })
-      const stakedUntilDate = stakedUntil ? moment.unix(stakedUntil.unlockTime).toDate() : null
+        const moralisStakedAt = moment(stake.block_timestamp).format('X')
+        let index = 0
+        poolStakes[2].find(date =>{
+          if (date.toString()===moralisStakedAt) {return date}
+          index++;
+        })
+        const bcStake = userStakes.find(bcStake => {
+          const unlockTime = bcStake.unlockTime.toString()
+          if (bcStake.indexInPool.toString() === index.toString() && unlockTime !== '0') {
+            return bcStake
+          }
+        })
+        const stakedUntilDate = bcStake ? moment.unix(bcStake.unlockTime).toDate() : null
 
-      await this.stakeService.create({
-        plan: plan,
-        pool: pool,
-        amount: parseFloat(utils.formatEther(stake.amount)),
-        stakedAt: stake.block_timestamp,
-        stakedUntil: stakedUntilDate,
-        wallet: stake.sender,
-        hash: stake.transaction_hash
-      })
+        await this.stakeService.create({
+          plan: bcStake ? plans[bcStake.planId] : undefined,
+          pool: pool,
+          amount: parseFloat(utils.formatEther(stake.amount)),
+          stakedAt: stake.block_timestamp,
+          stakedUntil: stakedUntilDate,
+          wallet: stake.sender,
+          hash: stake.transaction_hash
+        })
+      }
+      console.log(`Stakes added: ${moralisStakes.length}`)
+    } catch (error) {
+      console.error('Syncing stakes failed')
     }
-    console.log(`Stakes added: ${moralisStakes.length}`)
   }
 
   async syncClaims(fromDate: Date) {
-    const claims = await this.claimService.findAllAfter(fromDate)
-    const claimsHashes = claims.map(claim => { return claim.hash })
+    try {
+      const claims = await this.claimService.findAllAfter(fromDate)
+      const claimsHashes = claims.map(claim => { return claim.hash })
 
-    const moralisClaims = await this.moralisClaimService.findMissing(claimsHashes, fromDate)
+      const moralisClaims = await this.moralisClaimService.findMissing(claimsHashes, fromDate)
 
-    const poolsArray = await this.poolService.findAll();
-    const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
+      const poolsArray = await this.poolService.findAll();
+      const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
-    for await (const claim of moralisClaims) {
-      const pool = pools[claim.poolHandle]
-      await this.stakeService.claimedStakedAt(claim.recipient,pool,claim.block_timestamp)
-      await this.claimService.create({
-        wallet: claim.recipient,
-        pool: pool,
-        amount: parseFloat(utils.formatEther(claim.amount)),
-        claimDate: claim.block_timestamp,
-        hash: claim.transaction_hash,
-        unstaked: false
-      })
+      for await (const claim of moralisClaims) {
+        const pool = pools[claim.poolHandle]
+        await this.stakeService.claimedStakedAt(claim.recipient,pool,claim.block_timestamp)
+        await this.claimService.create({
+          wallet: claim.recipient,
+          pool: pool,
+          amount: parseFloat(utils.formatEther(claim.amount)),
+          claimDate: claim.block_timestamp,
+          hash: claim.transaction_hash,
+          unstaked: false
+        })
+      }
+      console.log(`Claims added: ${moralisClaims.length}`)
+    } catch (error) {
+      console.error('Syncing claims failed')
     }
-    console.log(`Claims added: ${moralisClaims.length}`)
   }
 
   async syncUnstake(fromDate: Date) {
-    const unstakes = await this.unstakeService.findAllAfter(fromDate)
-    const unstakesHashes = unstakes.map(unstake => { return unstake.hash })
+    try {
+      const unstakes = await this.unstakeService.findAllAfter(fromDate)
+      const unstakesHashes = unstakes.map(unstake => { return unstake.hash })
 
-    const moralisUnstakes = await this.moralisUnstakeService.findMissing(unstakesHashes, fromDate)
+      const moralisUnstakes = await this.moralisUnstakeService.findMissing(unstakesHashes, fromDate)
 
-    const poolsArray = await this.poolService.findAll();
-    const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
+      const poolsArray = await this.poolService.findAll();
+      const pools = Object.assign({}, ...poolsArray.map((x) => ({[x.creator]: x._id})));
 
-    for await (const unstake of moralisUnstakes) {
-      const amount = parseFloat(utils.formatEther(unstake.amount))
-      if (amount !== 0) {
-        const pool = pools[unstake.poolHandle]
-        const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
-        const stakeIDs = stakes.map(stake => {return stake._id});
-        await this.stakeService.collect(stakeIDs);
-        await this.claimService.findAndCollect(unstake.recipient, pool._id);
-        await this.unstakeService.create({
-          wallet: unstake.recipient,
-          hash: unstake.transaction_hash,
-          pool: pool,
-          unstakeDate: unstake.block_timestamp,
-          amount: amount,
-        })
+      for await (const unstake of moralisUnstakes) {
+        const amount = parseFloat(utils.formatEther(unstake.amount))
+        if (amount !== 0) {
+          const pool = pools[unstake.poolHandle]
+          const stakes = await this.stakeService.findUncollected(unstake.recipient, pool);
+          const stakeIDs = stakes.map(stake => {return stake._id});
+          await this.stakeService.collect(stakeIDs);
+          await this.claimService.findAndCollect(unstake.recipient, pool._id);
+          await this.unstakeService.create({
+            wallet: unstake.recipient,
+            hash: unstake.transaction_hash,
+            pool: pool,
+            unstakeDate: unstake.block_timestamp,
+            amount: amount,
+          })
+        }
       }
+      console.log(`Unstakes added: ${moralisUnstakes.length}`)
+    } catch (error) {
+      console.error('Syncing unstake failed')
     }
-    console.log(`Unstakes added: ${moralisUnstakes.length}`)
   }
 
   async getConfig(name: string): Promise<NodeRequire> {
