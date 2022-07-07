@@ -97,7 +97,9 @@ export class AppService {
           })
           const bcStake = userStakes.find(bcStake => {
             const unlockTime = bcStake.unlockTime.toString()
-            if (bcStake.indexInPool.toString() === index.toString() && unlockTime !== '0') {
+            if (bcStake.indexInPool.toString() === index.toString() 
+              && bcStake.poolHandle === stake.poolHandle 
+              && unlockTime !== '0') {
               return bcStake
             }
           })
@@ -222,7 +224,9 @@ export class AppService {
         })
         const bcStake = userStakes.find(bcStake => {
           const unlockTime = bcStake.unlockTime.toString()
-          if (bcStake.indexInPool.toString() === index.toString() && unlockTime !== '0') {
+          if (bcStake.indexInPool.toString() === index.toString() 
+              && bcStake.poolHandle === stake.poolHandle 
+              && unlockTime !== '0') {
             return bcStake
           }
         })
