@@ -13,7 +13,11 @@ export class StakingContract {
     } catch (error) {
       return null
     }
+  }
 
+  public async calculateReward(config:string,poolHandle: string, wallet: string) {
+    const contract = await this.getStakingContract(config)
+    return contract.calculateReward(poolHandle,wallet)
   }
 
 }

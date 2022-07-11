@@ -10,6 +10,9 @@ import { Pool } from '../pool/entities/pool.entity';
 import { PoolService } from '../pool/pool.service';
 import { ActiveStakesPool } from './entities/activeStakesPool';
 import { isNumber } from 'class-validator';
+import { CONFIG } from 'src/config';
+import { StakingContract } from 'src/shared/StakingContract';
+import { ethers } from 'ethers';
 
 @Injectable()
 export class StakeService {
@@ -18,6 +21,7 @@ export class StakeService {
     @InjectModel('AggregatedPool') private readonly aggregatedPool: Model<TopStakedPools>,
     private readonly planService: PlanService,
     private readonly poolService: PoolService,
+    private readonly contract: StakingContract,
   ){}
 
   async create(createStakeDto: CreateStakeDto): Promise<Stake> {
@@ -166,6 +170,8 @@ export class StakeService {
     let walletTotalAmount = 0
     let walletAverageAPY = 0
     let walletFarmed = 0
+    let bcWalletFarmed = await this.contract.calculateReward(CONFIG,pool.creator,wallet)
+    bcWalletFarmed = parseFloat(ethers.utils.formatEther(bcWalletFarmed))
 
     stakes.map(stake => {
       if(!members.includes(stake.wallet)) members.push(stake.wallet)
@@ -202,6 +208,7 @@ export class StakeService {
       walletAverageAPY,
       walletFarmed,
       walletStakesCount,
+      bcWalletFarmed,
       members,
       numberOfStakes: stakes.length,
       pool,
