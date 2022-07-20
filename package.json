@@ -35,7 +35,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "dotenv": "^16.0.1",
-    "ethers": "^5.6.4",
+    "ethers": "^5.6.9",
     "moment": "^2.29.4",
     "mongoose": "^6.4.5",
     "moralis": "^1.8.0",
