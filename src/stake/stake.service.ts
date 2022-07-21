@@ -14,8 +14,8 @@ import { isNumber } from 'class-validator';
 @Injectable()
 export class StakeService {
   constructor(
-    @InjectModel('Stake', 'primary_connection') private readonly stakeModel: Model<Stake>,
-    @InjectModel('AggregatedPool', 'primary_connection') private readonly aggregatedPool: Model<TopStakedPools>,
+    @InjectModel('Stake') private readonly stakeModel: Model<Stake>,
+    @InjectModel('AggregatedPool') private readonly aggregatedPool: Model<TopStakedPools>,
     private readonly planService: PlanService,
     private readonly poolService: PoolService,
   ){}

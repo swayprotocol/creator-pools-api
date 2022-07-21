@@ -12,7 +12,7 @@ import { StakeService } from '../stake/stake.service';
 @Injectable()
 export class UnstakeService {
   constructor(
-    @InjectModel('Unstake', 'primary_connection') private readonly unstakeModel: Model<Unstake>,
+    @InjectModel('Unstake') private readonly unstakeModel: Model<Unstake>,
     private readonly poolService: PoolService,
     @Inject(forwardRef(() => ClaimService))
     private readonly claimService: ClaimService,

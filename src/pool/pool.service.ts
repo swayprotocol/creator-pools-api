@@ -8,7 +8,7 @@ import { Pool } from './entities/pool.entity';
 export class PoolService {
 
   constructor(
-    @InjectModel('Pool', 'primary_connection') private readonly poolModel: Model<Pool>,
+    @InjectModel('Pool') private readonly poolModel: Model<Pool>,
   ){}
 
   async create(createPoolDto: CreatePoolDto): Promise<Pool> {

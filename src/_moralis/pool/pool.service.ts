@@ -7,7 +7,7 @@ import { Pool } from './entities/pool.entity';
 export class MoralisPoolService {
 
   constructor(
-    @InjectModel('Pool', 'primary_connection') private readonly poolModel: Model<Pool>,
+    @InjectModel('Pool') private readonly poolModel: Model<Pool>,
   ){}
 
   async findAll(): Promise<Pool[]> {

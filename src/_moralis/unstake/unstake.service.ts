@@ -7,7 +7,7 @@ import { Unstake } from './entities/unstake.entity';
 export class MoralisUnstakeService {
 
   constructor(
-    @InjectModel('Unstake', 'primary_connection') private readonly unstakeModel: Model<Unstake>,
+    @InjectModel('Unstake') private readonly unstakeModel: Model<Unstake>,
   ){}
 
   async findAll(): Promise<Unstake[]> {

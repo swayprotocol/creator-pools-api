@@ -7,7 +7,7 @@ import { Claim } from './entities/claim.entity';
 export class MoralisClaimService {
 
   constructor(
-    @InjectModel('Reward', 'primary_connection') private readonly claimModel: Model<Claim>,
+    @InjectModel('Reward') private readonly claimModel: Model<Claim>,
   ){}
 
   async findAll(): Promise<Claim[]> {
