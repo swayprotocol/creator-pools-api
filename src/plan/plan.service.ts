@@ -10,7 +10,7 @@ import { StakingContract } from '../shared/StakingContract';
 export class PlanService {
 
   constructor(
-    @InjectModel('Plan') private readonly planModel: Model<Plan>,
+    @InjectModel('Plan', 'primary_connection') private readonly planModel: Model<Plan>,
     private readonly contract: StakingContract
   ) {}
 
@@ -41,7 +41,7 @@ export class PlanService {
   }
 
   async getPlansBc(name: string): Promise<Plan[]> {
-    
+
     const stakingContract: Contract = await this.contract.getStakingContract(name);
     const plans = await this.planModel.find();
 

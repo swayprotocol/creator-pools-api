@@ -9,7 +9,7 @@ import { Claim } from './entities/claim.entity';
 export class ClaimService {
 
   constructor(
-    @InjectModel('Claim') private readonly claimModel: Model<Claim>,
+    @InjectModel('Claim', 'primary_connection') private readonly claimModel: Model<Claim>,
   ) {}
 
   async create(createClaimDto: CreateClaimDto): Promise<Claim> {

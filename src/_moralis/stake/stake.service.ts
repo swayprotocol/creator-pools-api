@@ -7,7 +7,7 @@ import { Stake } from './entities/stake.entity';
 export class MoralisStakeService {
 
   constructor(
-    @InjectModel('Stake') private readonly stakeModel: Model<Stake>,
+    @InjectModel('Stake', 'primary_connection') private readonly stakeModel: Model<Stake>,
   ){}
 
   async findAll(): Promise<Stake[]> {
@@ -28,5 +28,5 @@ export class MoralisStakeService {
     return stakes
   }
 
- 
+
 }
