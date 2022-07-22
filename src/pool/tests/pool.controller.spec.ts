@@ -49,14 +49,4 @@ describe('PoolController', () => {
       expect(pool).toEqual(poolStub());
     })
   })
-
-  describe('update', () => {
-    let pool: Pool;
-    let stub: Pool;
-    let poolDto: CreatePoolDto;
-
-    test('should return plan with same id', async () => {
-      expect(pool).toEqual(stub);   
-    })
-  })
 });
