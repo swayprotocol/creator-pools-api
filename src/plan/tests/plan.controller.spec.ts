@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreatePlanDto } from '../dto/create-plan.dto';
 import { Plan } from '../entities/plan.entity';
 import { PlanController } from '../plan.controller';
 import { PlanService } from '../plan.service';
@@ -28,30 +27,11 @@ describe('PlanController', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    let stub: Plan;
-    let planDto: CreatePlanDto;
-    let plan: Plan;
-
-    beforeEach(async () => {
-      stub = planStub();
-      planDto = {
-        apy: stub.apy,
-        availableUntil: stub.availableUntil,
-        lockMonths: stub.lockMonths,
-      }
-      plan = await controller.create(planDto);
-    })
-    test('should return a plan', () => {
-      expect(plan).toEqual(stub);
-    })
-  })
-
   describe('findAll', () => {
     let plans: Plan[];
 
     beforeEach(async () => {
-      plans= await controller.findAll();
+      plans = await controller.findAll();
     })
     test('should return all plans', async () => {
       expect(plans).toEqual([planStub()]);   
@@ -61,45 +41,39 @@ describe('PlanController', () => {
   describe('findOne', () => {
     let plan: Plan;
     let stub: Plan;
+
     beforeEach(async () => {
       stub = planStub();
-      plan= await controller.findOne(stub._id);
+      plan = await controller.findOne(stub._id);
     })
+
     test('should return plan with same id', async () => {
       expect(plan).toEqual(planStub());   
     })
   })
 
-  describe('update', () => {
-    let plan: Plan;
-    let stub: Plan;
-    let planDto: CreatePlanDto;
+  describe('active', () => {
+    let plans: Plan[];
 
     beforeEach(async () => {
-      stub = planStub();
-      planDto = {
-        apy: stub.apy,
-        availableUntil: stub.availableUntil,
-        lockMonths: stub.lockMonths,
-      }
-      
-      plan= await controller.update(stub._id,planDto);
+      plans = await controller.getActive();
     })
-    test('should return plan with same id', async () => {
-      expect(plan).toEqual(stub);   
+
+    test('should return all active plans', async () => {
+      expect(plans).toEqual([planStub()]);   
     })
   })
 
-  describe('remove', () => {
+  
+  describe('maxApy', ()=> {
     let plan: Plan;
     let stub: Plan;
     beforeEach(async () => {
       stub = planStub();
-      plan= await controller.remove(stub._id);
+      plan = await controller.getMaxApy();
     })
-    test('should return plan with same id', async () => {
-      expect(plan).toEqual(planStub());   
+    test('should return plan apy', async () => {
+      expect(plan.apy).toEqual(stub.apy);   
     })
   })
 });
-

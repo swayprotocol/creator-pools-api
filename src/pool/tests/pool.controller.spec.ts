@@ -28,26 +28,6 @@ describe('PoolController', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    let stub: Pool;
-    let poolDto: CreatePoolDto;
-    let pool: Pool;
-
-    beforeEach(async () => {
-      stub = poolStub();
-      poolDto = {
-        creator: stub.creator,
-        startTime: stub.startTime,
-        totalAmount: stub.totalAmount,
-        numberOfStakes: stub.numberOfStakes,
-      }
-      pool = await controller.create(poolDto);
-    })
-    test('should return a pool', () => {
-      expect(pool).toEqual(stub);
-    })
-  })
-
   describe('findAll', () => {
     let pools: Pool[];
     beforeEach(async () => {
@@ -75,30 +55,8 @@ describe('PoolController', () => {
     let stub: Pool;
     let poolDto: CreatePoolDto;
 
-    beforeEach(async () => {
-      stub = poolStub();
-      poolDto = {
-        creator: stub.creator,
-        startTime: stub.startTime,
-        totalAmount: stub.totalAmount,
-        numberOfStakes: stub.numberOfStakes,
-      }
-      pool = await controller.update(stub._id, poolDto);
-    })
     test('should return plan with same id', async () => {
       expect(pool).toEqual(stub);   
-    })
-  })
-
-  describe('describe', () => {
-    let pool: Pool;
-    let stub: Pool;
-    beforeEach(async () => {
-      stub = poolStub();
-      pool = await controller.remove(stub._id);
-    })
-    test('should return pool with same id',async () => {
-      expect(pool).toEqual(poolStub());
     })
   })
 });

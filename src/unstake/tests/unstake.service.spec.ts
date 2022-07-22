@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnstakeService } from '../unstake.service';
 
+jest.mock('../unstake.service')
+
 describe('UnstakeService', () => {
   let service: UnstakeService;
 
@@ -10,6 +12,7 @@ describe('UnstakeService', () => {
     }).compile();
 
     service = module.get<UnstakeService>(UnstakeService);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {

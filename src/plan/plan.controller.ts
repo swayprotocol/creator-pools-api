@@ -1,14 +1,10 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
-  Delete,
   Query,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
-import { CreatePlanDto } from './dto/create-plan.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ValidateMongoId } from './../validators/MongoId';
 import { Plan } from './entities/plan.entity';

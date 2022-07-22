@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClaimService } from '../claim.service';
 
+jest.mock('../claim.service');
+
 describe('ClaimService', () => {
   let service: ClaimService;
 
@@ -10,6 +12,7 @@ describe('ClaimService', () => {
     }).compile();
 
     service = module.get<ClaimService>(ClaimService);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
