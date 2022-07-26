@@ -3,29 +3,34 @@ import { PoolController } from '../pool.controller';
 import { PoolService } from '../pool.service';
 import { Pool } from '../entities/pool.entity';
 import { poolStub } from './pool.stub';
-import { CreatePoolDto } from '../dto/create-pool.dto';
-
-jest.mock('../pool.service');
 
 describe('PoolController', () => {
   let controller: PoolController;
-  let service: PoolService;
+
+  const mockPoolService = {
+    create: jest.fn().mockResolvedValue(poolStub()),
+    findAllAfter: jest.fn().mockResolvedValue([poolStub()]),
+    findAll: jest.fn().mockResolvedValue([poolStub()]),
+    findOne: jest.fn().mockResolvedValue(poolStub()),
+    findByHash: jest.fn().mockResolvedValue(poolStub()),
+    findOneByHandle: jest.fn().mockResolvedValue(poolStub()),
+    updateByHandle: jest.fn().mockResolvedValue(poolStub()),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [],
       controllers: [PoolController],
       providers: [PoolService],
-    }).compile();
+    })
+    .overrideProvider(PoolService)
+    .useValue(mockPoolService)
+    .compile();
 
     controller = module.get<PoolController>(PoolController);
-    service = module.get<PoolService>(PoolService);
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-    expect(service).toBeDefined();
   });
 
   describe('findAll', () => {
