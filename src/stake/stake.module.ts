@@ -6,6 +6,7 @@ import { stakeSchema } from './entities/stake.schema';
 import { PlanModule } from '../plan/plan.module';
 import { aggregatedPoolSchema } from '../pool/entities/aggregatedPool.schema';
 import { PoolModule } from '../pool/pool.module';
+import { StakingContract } from '../shared/StakingContract';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { PoolModule } from '../pool/pool.module';
     PoolModule,
   ],
   controllers: [StakeController],
-  providers: [StakeService],
+  providers: [StakeService, StakingContract],
   exports: [StakeService],
 })
 export class StakeModule {}

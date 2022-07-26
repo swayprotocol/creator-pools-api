@@ -8,6 +8,7 @@ export interface ActiveStakesPool {
   walletTotalAmount?: number,
   walletAverageAPY?: number,
   walletFarmed?: number,
+  bcWalletFarmed?: number,
   walletStakesCount?: number,
   totalAmount: number,
   totalFarmed: number,
