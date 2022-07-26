@@ -4,20 +4,29 @@ import { ClaimService } from '../claim.service';
 import { Claim } from '../entities/claim.entity';
 import { claimStub } from './claim.stub';
 
-jest.mock('../claim.service');
-
 describe('ClaimController', () => {
   let controller: ClaimController;
 
+  const mockClaimService = {
+    create: jest.fn().mockResolvedValue(claimStub()),
+    findAllAfter: jest.fn().mockResolvedValue([claimStub()]),
+    findAll: jest.fn().mockResolvedValue([claimStub()]),
+    findOne: jest.fn().mockResolvedValue(claimStub()),
+    findByHash: jest.fn().mockResolvedValue(claimStub()),
+    findAndCollect: jest.fn().mockResolvedValue([claimStub()]),
+    totalClaimed: jest.fn().mockResolvedValue(Number)
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [],
       controllers: [ClaimController],
       providers: [ClaimService],
-    }).compile();
+    })
+    .overrideProvider(ClaimService)
+    .useValue(mockClaimService)
+    .compile();
 
     controller = module.get<ClaimController>(ClaimController);
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
