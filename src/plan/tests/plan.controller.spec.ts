@@ -4,27 +4,35 @@ import { PlanController } from '../plan.controller';
 import { PlanService } from '../plan.service';
 import { planStub } from './plan.stub';
 
-jest.mock('../plan.service');
-
 describe('PlanController', () => {
   let controller: PlanController;
-  let service: PlanService;
+
+  const mockPlanService = {
+    create: jest.fn().mockResolvedValue(planStub()),
+    findAll: jest.fn().mockResolvedValue([planStub()]),
+    findOne: jest.fn().mockResolvedValue(planStub()),
+    findOneByBlockchainIndex: jest.fn().mockResolvedValue(planStub()),
+    remove: jest.fn().mockResolvedValue(planStub()),
+    getPlansBC: jest.fn().mockRejectedValue([planStub()]),
+    getActive: jest.fn().mockResolvedValue([planStub()]),
+    getMaxApy: jest.fn().mockResolvedValue(planStub()),
+    getAverageApy: jest.fn().mockResolvedValue(Number),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [],
       controllers: [PlanController],
       providers: [PlanService],
-    }).compile();
+    })
+    .overrideProvider(PlanService)
+    .useValue(mockPlanService)
+    .compile();
 
     controller = module.get<PlanController>(PlanController);
-    service = module.get<PlanService>(PlanService);
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-    expect(service).toBeDefined();
   });
 
   describe('findAll', () => {
