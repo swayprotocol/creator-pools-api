@@ -68,7 +68,6 @@ describe('ClaimService', () => {
 
   it('should find and set collected true', async () => {
     const claims = await service.findAndCollect(mockClaim.wallet,mockClaim.pool._id)
-    console.log(claims)
     expect(claims).toEqual([mockClaim])
   })
 
