@@ -10,18 +10,38 @@ jest.mock('../stake.service');
 
 describe('StakeController', () => {
   let controller: StakeController;
-  let service: StakeService;
+
+  const mockStakeService = {
+    create: jest.fn().mockResolvedValue(stakeStub()),
+    findAllAfter: jest.fn().mockResolvedValue([stakeStub()]),
+    findAll: jest.fn().mockResolvedValue([stakeStub()]),
+    findOne: jest.fn().mockResolvedValue(stakeStub()),
+    findByHash: jest.fn().mockResolvedValue(stakeStub()),
+    findUncollected: jest.fn().mockResolvedValue([stakeStub()]),
+    findStakedUntil: jest.fn().mockResolvedValue(stakeStub()),
+    claimedStakedAt: jest.fn().mockRejectedValue([stakeStub()]),
+    collect: jest.fn(),
+    channelDistribution: jest.fn().mockResolvedValue(distributionStub()),
+    activeStakes: jest.fn().mockResolvedValue([stakeStub()]),
+    activeStakesPools: jest.fn().mockResolvedValue([activeStakesPoolStub()]),
+    activeStakesPool: jest.fn().mockResolvedValue(activeStakesPoolStub()),
+    topCreatorPools: jest.fn().mockResolvedValue([topStakedPoolStub()]),
+    latestStakes: jest.fn().mockResolvedValue([stakeStub()]),
+    highestPositions: jest.fn().mockResolvedValue([stakeStub()]),
+    totalCurrentlyStaked: jest.fn().mockResolvedValue(Number),
+    totalStaked: jest.fn().mockResolvedValue(Number),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [],
       controllers: [StakeController],
       providers: [StakeService],
-    }).compile();
+    })
+    .overrideProvider(StakeService)
+    .useValue(mockStakeService)
+    .compile();
 
     controller = module.get<StakeController>(StakeController);
-    service = module.get<StakeService>(StakeService);
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {

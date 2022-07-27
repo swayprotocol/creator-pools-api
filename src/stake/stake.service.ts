@@ -14,7 +14,7 @@ import { isNumber } from 'class-validator';
 @Injectable()
 export class StakeService {
   constructor(
-    @InjectModel('Stake') private readonly stakeModel: Model<Stake>,
+    @InjectModel(Stake.name) private readonly stakeModel: Model<Stake>,
     @InjectModel('AggregatedPool') private readonly aggregatedPool: Model<TopStakedPools>,
     private readonly planService: PlanService,
     private readonly poolService: PoolService,
@@ -279,7 +279,7 @@ export class StakeService {
       }
     ])
 
-    if (total.length > 0) return total[0].totalAmount
+    if (total?.length > 0) return total[0].totalAmount
     return 0
   }
 
@@ -300,7 +300,7 @@ export class StakeService {
       }
     ])
 
-    if (total.length > 0) return total[0].totalAmount
+    if (total?.length > 0) return total[0].totalAmount
     return 0
   }
 }
