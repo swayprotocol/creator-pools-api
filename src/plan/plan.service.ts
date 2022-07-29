@@ -10,13 +10,12 @@ import { StakingContract } from '../shared/StakingContract';
 export class PlanService {
 
   constructor(
-    @InjectModel('Plan') private readonly planModel: Model<Plan>,
+    @InjectModel(Plan.name) private readonly planModel: Model<Plan>,
     private readonly contract: StakingContract
   ) {}
 
   async create(createPlanDto: CreatePlanDto): Promise<Plan> {
-    const plan = new this.planModel(createPlanDto)
-    await plan.save();
+    const plan = new this.planModel(createPlanDto).save();
     return plan;
   }
 

@@ -9,12 +9,11 @@ import { Claim } from './entities/claim.entity';
 export class ClaimService {
 
   constructor(
-    @InjectModel('Claim') private readonly claimModel: Model<Claim>,
+    @InjectModel(Claim.name) private readonly claimModel: Model<Claim>,
   ) {}
 
   async create(createClaimDto: CreateClaimDto): Promise<Claim> {
-    const claim = new this.claimModel(createClaimDto);
-    await claim.save();
+    const claim = await new this.claimModel(createClaimDto).save();
     return claim;
   }
 
@@ -72,7 +71,7 @@ export class ClaimService {
       }
     ])
 
-    if (total.length > 0) return total[0].totalAmount
+    if (total?.length > 0) return total[0].totalAmount
     return 0
   }
 }

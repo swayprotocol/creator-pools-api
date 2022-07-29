@@ -1,4 +1,4 @@
-import { Pool } from "src/pool/entities/pool.entity";
+import { Pool } from "../../pool/entities/pool.entity";
 
 export class TopStakedPools {
   pool: Pool;

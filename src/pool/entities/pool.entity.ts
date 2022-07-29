@@ -1,4 +1,4 @@
-export interface Pool {
+export class Pool {
   _id: string;
   creator: string;
   startTime: Date;
