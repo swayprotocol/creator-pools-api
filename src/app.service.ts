@@ -1,6 +1,7 @@
 import moment from 'moment';
 import Moralis from 'moralis/node';
 import { Injectable } from '@nestjs/common';
+import sanitize from 'sanitize-filename';
 import { Contract, utils } from 'ethers';
 import { StakingContract } from './shared/StakingContract';
 import { ClaimService } from './claim/claim.service';
@@ -311,6 +312,7 @@ export class AppService {
 
   async getConfig(name: string): Promise<NodeRequire> {
     try {
+      name = sanitize(name)
       const config = await require(`./shared/configs/${name}Config.json`)
       return config
     } catch (error) {
@@ -320,6 +322,7 @@ export class AppService {
 
   async getStakingAbi(name: string): Promise<NodeRequire> {
     try {
+      name = sanitize(name)
       const abi = await require(`./shared/abis/${name}/staking-abi.json`)
       return abi
     } catch (error) {
@@ -329,6 +332,7 @@ export class AppService {
 
   async getTokenAbi(name: string): Promise<NodeRequire> {
     try {
+      name = sanitize(name)
       const abi = await require(`./shared/abis/${name}/token-abi.json`)
       return abi
     } catch (error) {
