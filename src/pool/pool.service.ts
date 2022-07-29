@@ -37,7 +37,7 @@ export class PoolService {
   }
 
   async findOneByHandle(handle: string): Promise<Pool> {
-    const plan = await this.poolModel.findOne({ creator: handle});
+    const plan = await this.poolModel.findOne({ creator: {$eq: handle}});
     return plan;
   }
 
