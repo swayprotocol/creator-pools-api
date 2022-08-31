@@ -10,9 +10,6 @@ import { StakeModule } from '../stake/stake.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{name: 'Unstake', schema: unstakeSchema}], 'ourDb'),
-    PoolModule,
-    forwardRef(() => ClaimModule),
-    StakeModule,
   ],
   controllers: [UnstakeController],
   providers: [UnstakeService],

@@ -1,4 +1,4 @@
-export interface Plan {
+export class Plan {
   _id: string;
   blockchainIndex: number;
   apy: number;
