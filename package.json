@@ -38,7 +38,7 @@
     "ethers": "^5.6.9",
     "moment": "^2.29.4",
     "mongoose": "^6.4.6",
-    "moralis": "^1.9.1",
+    "moralis": "^2.6.5",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
